@@ -5,6 +5,9 @@ import { Router } from "express";
 /** Enrutador de usuarios  */
 import userRoutes from "./user.routes.js";
 
+//Importa el modelo alumno
+import alumnoRoutes from "./alumno.routes.js";
+
 /** Enrutador de autenticación */
 import authRoutes from "./auth.routes.js";
 
@@ -16,6 +19,7 @@ const router = Router();
 
 // Define las rutas para los usuarios /api/usuarios
 router.use("/users", authenticationMiddleware, userRoutes);
+router.use("/alumnos", authenticationMiddleware, alumnoRoutes);
 // Define las rutas para la autenticación /api/auth
 router.use("/auth", authRoutes);
 
