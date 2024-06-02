@@ -30,6 +30,18 @@ const userSchema = new mongoose.Schema(
         ref: "Role",
       },
     ],
+    likes: {
+      type: [String],
+      default: []
+    },
+    dislikes: {
+      type: [String],
+      default: []
+    },
+    match: {
+      type: [String],
+      default: []
+    },
   },
   {
     versionKey: false,

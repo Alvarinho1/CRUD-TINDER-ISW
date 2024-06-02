@@ -6,7 +6,7 @@ import { handleError } from "../utils/errorHandler.js";
 async function getFiltros() {
   try {
     const filtros = await Filtro.find().exec();
-    if (!filtros) return [null, "No hay filtros"];
+    if (!filtros || filtros.length === 0) return [null, "No hay filtros disponibles"];
 
     return [filtros, null];
   } catch (error) {
@@ -72,7 +72,10 @@ async function updateFiltro(id, filtro) {
 
 async function deleteFiltro(id) {
   try {
-    return await Filtro.findByIdAndDelete(id);
+    const deletedFiltro = await Filtro.findByIdAndDelete(id);
+    if (!deletedFiltro) return [null, "El filtro no existe"];
+
+    return [deletedFiltro, null];
   } catch (error) {
     handleError(error, "filtro.service -> deleteFiltro");
   }

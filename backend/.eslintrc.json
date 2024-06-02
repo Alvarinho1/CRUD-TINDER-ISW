@@ -10,7 +10,7 @@
   },
   "rules": {
     "require-jsdoc": [
-      "warn",
+      "",
       {
         "require": {
           "FunctionDeclaration": true,
@@ -25,14 +25,7 @@
     "new-cap": "off",
     "object-curly-spacing": ["error", "always"],
     "array-bracket-spacing": "off",
-    "max-len": [
-      "error",
-      {
-        "code": 100,
-        "tabWidth": 2,
-        "comments": 150
-      }
-    ],
+    
     "valid-jsdoc": "off",
     "no-console": "warn",
     "quotes": ["error", "double"],
