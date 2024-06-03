@@ -1,4 +1,5 @@
 import { respondSuccess, respondError } from "../utils/resHandler.js";
+import { handleError } from "../utils/errorHandler.js";
 import AlumnoService from "../services/alumno.service.js";
 
 async function getAlumnos(req, res) {
@@ -66,10 +67,70 @@ async function deleteAlumno(req, res) {
   }
 }
 
+async function likeAlumno(req, res) {
+  try {
+    const { alumnoId, likedAlumnoId } = req.body;
+    const [alumno, error] = await AlumnoService.likeAlumno(alumnoId, likedAlumnoId);
+
+    if (error) return respondError(req, res, 400, error);
+
+    respondSuccess(req, res, 200, alumno);
+  } catch (error) {
+    handleError(error, "alumno.controller -> likeAlumno");
+    respondError(req, res, 500, "Error interno del servidor");
+  }
+}
+
+async function dislikeAlumno(req, res) {
+  try {
+    const { alumnoId, dislikedAlumnoId } = req.body;
+    const [alumno, error] = await AlumnoService.dislikeAlumno(alumnoId, dislikedAlumnoId);
+
+    if (error) return respondError(req, res, 400, error);
+
+    respondSuccess(req, res, 200, alumno);
+  } catch (error) {
+    handleError(error, "alumno.controller -> dislikeAlumno");
+    respondError(req, res, 500, "Error interno del servidor");
+  }
+}
+
+async function removeLikeAlumno(req, res) {
+  try {
+    const { alumnoId, likedAlumnoId } = req.body;
+    const [alumno, error] = await AlumnoService.removeLikeAlumno(alumnoId, likedAlumnoId);
+
+    if (error) return respondError(req, res, 400, error);
+
+    respondSuccess(req, res, 200, alumno);
+  } catch (error) {
+    handleError(error, "alumno.controller -> removeLikeAlumno");
+    respondError(req, res, 500, "Error interno del servidor");
+  }
+}
+
+async function removeDislikeAlumno(req, res) {
+  try {
+    const { alumnoId, dislikedAlumnoId } = req.body;
+    const [alumno, error] = await AlumnoService.removeDislikeAlumno(alumnoId, dislikedAlumnoId);
+
+    if (error) return respondError(req, res, 400, error);
+
+    respondSuccess(req, res, 200, alumno);
+  } catch (error) {
+    handleError(error, "alumno.controller -> removeDislikeAlumno");
+    respondError(req, res, 500, "Error interno del servidor");
+  }
+}
+
 export default {
   getAlumnos,
   createAlumno,
   getAlumnoByRut,
   updateAlumno,
   deleteAlumno,
+  likeAlumno,
+  dislikeAlumno,
+  removeLikeAlumno,
+  removeDislikeAlumno,
 };

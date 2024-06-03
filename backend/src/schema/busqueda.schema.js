@@ -1,10 +1,6 @@
 import Joi from "joi";
 
-/**
- * Esquema de validación para el cuerpo de la solicitud del filtro.
- * @constant {Object}
- */
-const filtroBodySchema = Joi.object({
+const busquedaSchema = Joi.object({
   carrera: Joi.string().valid(
     "Arquitectura",
     "Diseño Gráfico",
@@ -47,25 +43,24 @@ const filtroBodySchema = Joi.object({
     "Ingeniería en Recursos Naturales",
     "Ingeniería Estadística",
     "Química y Farmacia"
-  ).required().messages({
+  ).optional().messages({
     "any.only": "La carrera proporcionada no es válida.",
-    "any.required": "La carrera es obligatoria.",
     "string.base": "La carrera debe ser de tipo string.",
-  }),
-  curso: Joi.string().allow("", null).optional().messages({
-    "any.allowOnly": "El curso proporcionado no es válido.",
-    "string.base": "El curso debe ser de tipo string.",
-  }),
-  intereses: Joi.array().items(Joi.string()).optional().messages({
-    "array.base": "Los intereses deben ser de tipo array.",
-    "string.base": "Cada interés debe ser de tipo string.",
   }),
   genero: Joi.string().valid("masculino", "femenino").optional().messages({
     "any.only": "El género proporcionado no es válido.",
     "string.base": "El género debe ser de tipo string.",
   }),
+  cursos: Joi.array().items(Joi.string()).optional().messages({
+    "array.base": "Los cursos deben ser de tipo array.",
+    "string.base": "Cada curso debe ser de tipo string.",
+  }),
+  areasDeInteres: Joi.array().items(Joi.string()).optional().messages({
+    "array.base": "Las áreas de interés deben ser de tipo array.",
+    "string.base": "Cada área de interés debe ser de tipo string.",
+  }),
 }).messages({
   "object.unknown": "No se permiten propiedades adicionales.",
 });
 
-export { filtroBodySchema };
+export { busquedaSchema };
