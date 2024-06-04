@@ -32,4 +32,26 @@ async function isAdmin(req, res, next) {
   }
 }
 
-export { isAdmin };
+async function isAlumnoOrAdmin(req, res, next) {
+  try {
+    const user = await User.findOne({ email: req.email });
+    const roles = await Role.find({ _id: { $in: user.roles } });
+    const isAdmin = roles.some(role => role.name === "admin");
+
+    if (isAdmin || req.params.rut === user.rut) {
+      next();
+      return;
+    }
+    return respondError(
+      req,
+      res,
+      401,
+      "No autorizado para realizar esta acción",
+    );
+  } catch (error) {
+    handleError(error, "authorization.middleware -> isAlumnoOrAdmin");
+  }
+}
+
+
+export { isAdmin, isAlumnoOrAdmin };

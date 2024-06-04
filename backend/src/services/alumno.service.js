@@ -8,6 +8,7 @@ async function getAlumnos() {
     return [alumnos, null];
   } catch (error) {
     handleError(error, "alumno.service -> getAlumnos");
+    return [null, "Error al obtener los alumnos"];
     return [null, error.message];
   }
 }
@@ -16,7 +17,7 @@ async function createAlumno(alumno) {
   try {
     const { nombre, apellidos, genero, rut, correo, carrera, cursos, areasDeInteres } = alumno;
 
-    const alumnoFound = await Alumno.findOne({ rut: alumno.rut });
+    const alumnoFound = await Alumno.findOne({ rut });
     if (alumnoFound) return [null, "El alumno ya existe"];
 
     const newAlumno = new Alumno({
@@ -34,6 +35,7 @@ async function createAlumno(alumno) {
     return [newAlumno, null];
   } catch (error) {
     handleError(error, "alumno.service -> createAlumno");
+    return [null, "Error al crear el alumno"];
     return [null, error.message];
   }
 }
@@ -45,6 +47,7 @@ async function getAlumnoByRut(rut) {
     return [alumno, null];
   } catch (error) {
     handleError(error, "alumno.service -> getAlumnoByRut");
+    return [null, "Error al obtener el alumno"];
     return [null, error.message];
   }
 }
@@ -73,17 +76,19 @@ async function updateAlumno(rut, alumno) {
     return [alumnoUpdated, null];
   } catch (error) {
     handleError(error, "alumno.service -> updateAlumno");
+    return [null, "Error al actualizar el alumno"];
     return [null, error.message];
   }
 }
 
 async function deleteAlumno(rut) {
   try {
-    const alumnoDeleted = await Alumno.findOneAndDelete({ rut });
-    if (!alumnoDeleted) return [null, "El alumno no existe"];
-    return [alumnoDeleted, null];
+    const alumno = await Alumno.findOneAndDelete({ rut });
+    if (!alumno) return [null, "El alumno no existe"];
+    return [alumno, null];
   } catch (error) {
     handleError(error, "alumno.service -> deleteAlumno");
+    return [null, "Error al eliminar el alumno"];
     return [null, error.message];
   }
 }
