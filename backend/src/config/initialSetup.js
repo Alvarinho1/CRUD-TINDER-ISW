@@ -2,6 +2,7 @@
 // Importa el modelo de datos 'Role'
 import Role from "../models/role.model.js";
 import User from "../models/user.model.js";
+import Alumno from "../models/alumno.model.js";
 
 /**
  * Crea los roles por defecto en la base de datos.
@@ -19,6 +20,7 @@ async function createRoles() {
     await Promise.all([
       new Role({ name: "user" }).save(),
       new Role({ name: "admin" }).save(),
+      new Role({ name: "alumno"}).save(),
     ]);
     console.log("* => Roles creados exitosamente");
   } catch (error) {

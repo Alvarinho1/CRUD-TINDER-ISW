@@ -82,8 +82,7 @@ const alumnoSchema = new mongoose.Schema(
   );
 
 
-// 'Alumno' data model
+
 const Alumno = mongoose.model("Alumno", alumnoSchema);
 
-// Exporta el modelo 'Alumno'
 export default Alumno;
