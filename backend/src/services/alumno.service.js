@@ -9,7 +9,6 @@ async function getAlumnos() {
   } catch (error) {
     handleError(error, "alumno.service -> getAlumnos");
     return [null, "Error al obtener los alumnos"];
-    return [null, error.message];
   }
 }
 
@@ -36,7 +35,6 @@ async function createAlumno(alumno) {
   } catch (error) {
     handleError(error, "alumno.service -> createAlumno");
     return [null, "Error al crear el alumno"];
-    return [null, error.message];
   }
 }
 
@@ -48,7 +46,6 @@ async function getAlumnoByRut(rut) {
   } catch (error) {
     handleError(error, "alumno.service -> getAlumnoByRut");
     return [null, "Error al obtener el alumno"];
-    return [null, error.message];
   }
 }
 
@@ -77,7 +74,6 @@ async function updateAlumno(rut, alumno) {
   } catch (error) {
     handleError(error, "alumno.service -> updateAlumno");
     return [null, "Error al actualizar el alumno"];
-    return [null, error.message];
   }
 }
 
@@ -89,7 +85,6 @@ async function deleteAlumno(rut) {
   } catch (error) {
     handleError(error, "alumno.service -> deleteAlumno");
     return [null, "Error al eliminar el alumno"];
-    return [null, error.message];
   }
 }
 

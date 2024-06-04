@@ -100,6 +100,7 @@ async function BuscarDislikesAlumnorut(rut) {
 async function BuscarAlumnoConMasLikes() {
     try {
         const maxLikes = await Alumno.aggregate([
+            { $addFields: { likes: { $ifNull: ["$likes", []] } } },
             { $project: { likeCount: { $size: "$likes" } } },
             { $sort: { likeCount: -1 } },
             { $limit: 1 }
@@ -112,6 +113,7 @@ async function BuscarAlumnoConMasLikes() {
         const maxLikeCount = maxLikes[0].likeCount;
 
         const alumnosConMasLikes = await Alumno.aggregate([
+            { $addFields: { likes: { $ifNull: ["$likes", []] } } },
             { $project: { nombre: 1, apellidos: 1, rut: 1, likeCount: { $size: "$likes" } } },
             { $match: { likeCount: maxLikeCount } }
         ]);
@@ -126,6 +128,7 @@ async function BuscarAlumnoConMasLikes() {
 async function BuscarAlumnoConMasDislikes() {
     try {
         const maxDislikes = await Alumno.aggregate([
+            { $addFields: { dislikes: { $ifNull: ["$dislikes", []] } } },
             { $project: { dislikeCount: { $size: "$dislikes" } } },
             { $sort: { dislikeCount: -1 } },
             { $limit: 1 }
@@ -138,6 +141,7 @@ async function BuscarAlumnoConMasDislikes() {
         const maxDislikeCount = maxDislikes[0].dislikeCount;
 
         const alumnosConMasDislikes = await Alumno.aggregate([
+            { $addFields: { dislikes: { $ifNull: ["$dislikes", []] } } },
             { $project: { nombre: 1, apellidos: 1, rut: 1, dislikeCount: { $size: "$dislikes" } } },
             { $match: { dislikeCount: maxDislikeCount } }
         ]);
