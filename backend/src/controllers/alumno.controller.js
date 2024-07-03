@@ -1,6 +1,7 @@
 import { respondSuccess, respondError } from "../utils/resHandler.js";
 import { handleError } from "../utils/errorHandler.js";
 import AlumnoService from "../services/alumno.service.js";
+import { alumnoBodySchema } from "../schema/alumno.schema.js";
 
 async function getAlumnos(req, res) {
   try {
@@ -17,6 +18,9 @@ async function getAlumnos(req, res) {
 
 async function createAlumno(req, res) {
   try {
+    const { error: validationError } = alumnoBodySchema.validate(req.body);
+    if (validationError) return respondError(req, res, 400, validationError.details[0].message);
+
     const { body } = req;
     const [newAlumno, error] = await AlumnoService.createAlumno(body);
 
@@ -43,6 +47,9 @@ async function getAlumnoByRut(req, res) {
 
 async function updateAlumno(req, res) {
   try {
+    const { error: validationError } = alumnoBodySchema.validate(req.body);
+    if (validationError) return respondError(req, res, 400, validationError.details[0].message);
+
     const { params, body } = req;
     const [updatedAlumno, error] = await AlumnoService.updateAlumno(params.rut, body);
 

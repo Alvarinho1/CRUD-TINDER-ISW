@@ -24,10 +24,9 @@ const alumnoBodySchema = Joi.object({
     "string.max": "El rut debe tener al menos 10 caracteres.",
     "string.pattern.base": "El rut tiene el formato XXXXXXXX-X, ejemplo: 12345678-9.",
   }),
-  correo: Joi.string().email().required().messages({
+  correo: Joi.string().pattern(/^[a-zA-Z0-9._%+-]+@alumnos\.ubiobio\.cl$/).required().messages({
     "string.empty": "El correo electrónico no puede estar vacío.",
     "any.required": "El correo electrónico es obligatorio.",
-    "string.email": "El correo electrónico debe tener un formato válido.",
     "string.pattern.base": "El correo electrónico debe tener la extensión @alumnos.ubiobio.cl.",
   }),
   carrera: Joi.string().valid(
