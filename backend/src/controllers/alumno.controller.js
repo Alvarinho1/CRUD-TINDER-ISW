@@ -130,6 +130,72 @@ async function removeDislikeAlumno(req, res) {
   }
 }
 
+async function superLikeAlumno(req, res) {
+  try {
+    const { alumnoId, superlikedAlumnoId } = req.body;
+    const [alumno, error] = await AlumnoService.superLikeAlumno(alumnoId, superlikedAlumnoId);
+
+    if (error) return respondError(req, res, 400, error);
+
+    respondSuccess(req, res, 200, alumno);
+  } catch (error) {
+    handleError(error, "alumno.controller -> superLikeAlumno");
+    respondError(req, res, 500, "Error interno del servidor");
+  }
+}
+
+async function quitarSuperLikeAlumno(req, res) {
+  try {
+    const { alumnoId, superlikedAlumnoId } = req.body; // Cambiado a superlikedAlumnoId
+    const [alumno, message] = await AlumnoService.quitarSuperLikeAlumno(alumnoId, superlikedAlumnoId); // Cambiado a superlikedAlumnoId
+
+    if (!alumno) {
+      return respondError(req, res, 400, message);
+    }
+
+    respondSuccess(req, res, 200, { alumno, message });
+  } catch (error) {
+    console.error(error);
+    respondError(req, res, 500, "Error interno del servidor");
+  }
+}
+
+
+
+async function destacarPerfilAlumno(req, res) {
+  try {
+    const { alumnoId, destacarAlumnoId } = req.body;
+    const [alumno, message] = await AlumnoService.destacarPerfilAlumno(alumnoId, destacarAlumnoId);
+
+    if (!alumno) {
+      return respondError(req, res, 400, message);
+    }
+
+    respondSuccess(req, res, 200, { alumno, message });
+  } catch (error) {
+    console.error(error);
+    respondError(req, res, 500, "Error interno del servidor");
+  }
+}
+
+
+async function quitarDestacadoPerfilAlumno(req, res) {
+  try {
+    const { alumnoId, destacarAlumnoId } = req.body; // Cambiado a destacarAlumnoId
+    const [alumno, message] = await AlumnoService.quitarDestacadoPerfilAlumno(alumnoId, destacarAlumnoId); // Cambiado a destacarAlumnoId
+
+    if (!alumno) {
+      return respondError(req, res, 400, message);
+    }
+
+    respondSuccess(req, res, 200, { alumno, message });
+  } catch (error) {
+    console.error(error);
+    respondError(req, res, 500, "Error interno del servidor");
+  }
+}
+
+
 export default {
   getAlumnos,
   createAlumno,
@@ -140,4 +206,8 @@ export default {
   dislikeAlumno,
   removeLikeAlumno,
   removeDislikeAlumno,
+  superLikeAlumno,
+  quitarSuperLikeAlumno,
+  destacarPerfilAlumno,
+  quitarDestacadoPerfilAlumno,
 };

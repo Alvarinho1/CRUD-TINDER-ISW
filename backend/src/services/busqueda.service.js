@@ -3,14 +3,20 @@ import { handleError } from "../utils/errorHandler.js";
 
 async function BuscarDisponibles() {
     try {
-        const disponibles = await Alumno.find();
-        if (!disponibles || disponibles.length === 0) return [null, "No hay resultados"];
+        // Utilizar la función de agregación para obtener resultados aleatorios
+        const disponibles = await Alumno.aggregate([{ $sample: { size: 100 } }]);
+
+        if (!disponibles || disponibles.length === 0) {
+            return [null, "No hay resultados"];
+        }
+        
         return [disponibles, null];
     } catch (error) {
         handleError(error, "busqueda.service -> BuscarDisponibles");
         return [null, "No hay resultados"];
     }
 }
+
 
 async function BuscarPorCategoria(carrera, genero, cursos, areasDeInteres) {
     try {
@@ -32,15 +38,19 @@ async function BuscarPorCategoria(carrera, genero, cursos, areasDeInteres) {
 async function BuscarLikesAlumno() {
     try {
         const alumnos = await Alumno.find(
-            { likes: { $exists: true, $ne: [] } },
+            { "likes.alumnoId": { $exists: true, $ne: [] } },
             { nombre: 1, apellidos: 1, rut: 1, likes: 1 }
-        ).populate('likes', 'nombre apellidos rut');
+        );
 
         if (!alumnos || alumnos.length === 0) {
             return [null, "No hay ningún alumno con likes"];
         }
 
-        return [alumnos, null];
+        // Ejemplo de cómo manejar los datos de 'likes' manualmente
+        const populatedAlumnos = await Alumno.populate(alumnos, { path: "likes.alumnoId" });
+
+        // Procesar y devolver los datos como desees
+        return [populatedAlumnos, null];
     } catch (error) {
         handleError(error, "busqueda.service -> BuscarLikesAlumno");
         return [null, error.message];
@@ -52,13 +62,17 @@ async function BuscarDislikesAlumno() {
         const alumnos = await Alumno.find(
             { dislikes: { $exists: true, $ne: [] } },
             { nombre: 1, apellidos: 1, rut: 1, dislikes: 1 }
-        ).populate('dislikes', 'nombre apellidos rut');
+        );
 
         if (!alumnos || alumnos.length === 0) {
             return [null, "No hay ningún alumno con dislikes"];
         }
 
-        return [alumnos, null];
+        // Ejemplo de cómo manejar los datos de 'dislikes' manualmente
+        const populatedAlumnos = await Alumno.populate(alumnos, { path: "dislikes.alumnoId" });
+
+        // Procesar y devolver los datos como desees
+        return [populatedAlumnos, null];
     } catch (error) {
         handleError(error, "busqueda.service -> BuscarDislikesAlumno");
         return [null, error.message];
@@ -67,14 +81,18 @@ async function BuscarDislikesAlumno() {
 
 async function BuscarLikesAlumnorut(rut) {
     try {
-        const alumno = await Alumno.findOne({ rut }, { nombre: 1, apellidos: 1, rut: 1, likes: 1 }).populate('likes', 'nombre apellidos rut').exec();
+        const alumno = await Alumno.findOne({ rut }, { nombre: 1, apellidos: 1, rut: 1, likes: 1 });
         if (!alumno) return [null, "El alumno no existe"];
 
         if (!alumno.likes || alumno.likes.length === 0) {
             return [null, "El alumno no tiene likes"];
         }
 
-        return [alumno, null];
+        // Ejemplo de cómo manejar los datos de 'likes' manualmente
+        const populatedAlumno = await Alumno.populate(alumno, { path: "likes.alumnoId" });
+
+        // Procesar y devolver los datos como desees
+        return [populatedAlumno, null];
     } catch (error) {
         handleError(error, "busqueda.service -> BuscarLikesAlumnorut");
         return [null, error.message];
@@ -83,72 +101,84 @@ async function BuscarLikesAlumnorut(rut) {
 
 async function BuscarDislikesAlumnorut(rut) {
     try {
-        const alumno = await Alumno.findOne({ rut }, { nombre: 1, apellidos: 1, rut: 1, dislikes: 1 }).populate('dislikes', 'nombre apellidos rut').exec();
+        const alumno = await Alumno.findOne({ rut }, { nombre: 1, apellidos: 1, rut: 1, dislikes: 1 });
         if (!alumno) return [null, "El alumno no existe"];
 
         if (!alumno.dislikes || alumno.dislikes.length === 0) {
             return [null, "El alumno no tiene dislikes"];
         }
 
-        return [alumno, null];
+        // Ejemplo de cómo manejar los datos de 'dislikes' manualmente
+        const populatedAlumno = await Alumno.populate(alumno, { path: "dislikes.alumnoId" });
+
+        // Procesar y devolver los datos como desees
+        return [populatedAlumno, null];
     } catch (error) {
         handleError(error, "busqueda.service -> BuscarDislikesAlumnorut");
         return [null, error.message];
     }
 }
 
-async function BuscarAlumnoConMasLikes() {
+async function RankingAlumnosLikes() {
     try {
-        const maxLikes = await Alumno.aggregate([
+        const rankingAlumnosLikes = await Alumno.aggregate([
             { $addFields: { likes: { $ifNull: ["$likes", []] } } },
-            { $project: { likeCount: { $size: "$likes" } } },
+            { $match: { likes: { $not: { $size: 0 } } } }, // Filtrar solo los alumnos con likes
+            { $project: { nombre: 1, apellidos: 1, rut: 1, likeCount: { $size: "$likes" } } },
             { $sort: { likeCount: -1 } },
-            { $limit: 1 }
+            { $limit: 10 }
         ]);
 
-        if (!maxLikes || maxLikes.length === 0 || maxLikes[0].likeCount === 0) {
-            return [null, "No se encontró ningún alumno con likes"];
+        if (!rankingAlumnosLikes || rankingAlumnosLikes.length === 0) {
+            return [null, "No se encontraron alumnos con likes"];
         }
 
-        const maxLikeCount = maxLikes[0].likeCount;
-
-        const alumnosConMasLikes = await Alumno.aggregate([
-            { $addFields: { likes: { $ifNull: ["$likes", []] } } },
-            { $project: { nombre: 1, apellidos: 1, rut: 1, likeCount: { $size: "$likes" } } },
-            { $match: { likeCount: maxLikeCount } }
-        ]);
-
-        return [alumnosConMasLikes, null];
+        return [rankingAlumnosLikes, null];
     } catch (error) {
-        handleError(error, "busqueda.service -> BuscarAlumnoConMasLikes");
+        handleError(error, "busqueda.service -> RankingAlumnosLikes");
         return [null, error.message];
     }
 }
 
-async function BuscarAlumnoConMasDislikes() {
+async function RankingAlumnosDislikes() {
     try {
-        const maxDislikes = await Alumno.aggregate([
+        const rankingAlumnosDislikes = await Alumno.aggregate([
             { $addFields: { dislikes: { $ifNull: ["$dislikes", []] } } },
-            { $project: { dislikeCount: { $size: "$dislikes" } } },
+            { $match: { dislikes: { $not: { $size: 0 } } } }, // Filtrar solo los alumnos con dislikes
+            { $project: { nombre: 1, apellidos: 1, rut: 1, dislikeCount: { $size: "$dislikes" } } },
             { $sort: { dislikeCount: -1 } },
-            { $limit: 1 }
+            { $limit: 10 }
         ]);
 
-        if (!maxDislikes || maxDislikes.length === 0 || maxDislikes[0].dislikeCount === 0) {
-            return [null, "No se encontró ningún alumno con dislikes"];
+        if (!rankingAlumnosDislikes || rankingAlumnosDislikes.length === 0) {
+            return [null, "No se encontraron alumnos con dislikes"];
         }
 
-        const maxDislikeCount = maxDislikes[0].dislikeCount;
-
-        const alumnosConMasDislikes = await Alumno.aggregate([
-            { $addFields: { dislikes: { $ifNull: ["$dislikes", []] } } },
-            { $project: { nombre: 1, apellidos: 1, rut: 1, dislikeCount: { $size: "$dislikes" } } },
-            { $match: { dislikeCount: maxDislikeCount } }
-        ]);
-
-        return [alumnosConMasDislikes, null];
+        return [rankingAlumnosDislikes, null];
     } catch (error) {
-        handleError(error, "busqueda.service -> BuscarAlumnoConMasDislikes");
+        handleError(error, "busqueda.service -> RankingAlumnosDislikes");
+        return [null, error.message];
+    }
+}
+
+async function BuscarSuperLikes() {
+    try {
+        const alumnos = await Alumno.find(
+            { superLikes: { $exists: true, $ne: [] } },
+            { nombre: 1, apellidos: 1, rut: 1, superLikes: 1 }
+        );
+
+        if (!alumnos || alumnos.length === 0) {
+            return [null, "No hay ningún alumno con superlikes"];
+        }
+
+        // Ejemplo de cómo manejar los datos de 'superLikes' manualmente
+        const populatedAlumnos = await Alumno.populate(alumnos, { path: "superLikes.alumnoId" });
+
+        // Procesar y devolver los datos como desees
+        return [populatedAlumnos, null];
+    } catch (error) {
+        handleError(error, "busqueda.service -> BuscarSuperLikes");
         return [null, error.message];
     }
 }
@@ -160,6 +190,7 @@ export default {
     BuscarDislikesAlumno,
     BuscarLikesAlumnorut,
     BuscarDislikesAlumnorut,
-    BuscarAlumnoConMasLikes,
-    BuscarAlumnoConMasDislikes,
+    RankingAlumnosLikes,
+    RankingAlumnosDislikes,
+    BuscarSuperLikes
 };

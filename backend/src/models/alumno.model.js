@@ -77,23 +77,31 @@ const alumnoSchema = new mongoose.Schema(
     areasDeInteres: [String],
     likes: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.Mixed,
         ref: "Alumno",
       },
     ],
     dislikes: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.Mixed,
         ref: "Alumno",
       },
-      
     ],
+    superLikes: [
+      {
+        type: mongoose.Schema.Types.Mixed,
+        ref: "Alumno",
+      },
+    ],
+    destacado: {
+      type: mongoose.Schema.Types.Mixed,
+      ref: "Alumno",
+    },
   },
   {
     versionKey: false,
   },
 );
-
 
 const Alumno = mongoose.model("Alumno", alumnoSchema);
 
