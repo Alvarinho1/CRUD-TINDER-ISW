@@ -11,6 +11,8 @@ import alumnoRoutes from "./alumno.routes.js";
 /** Enrutador de autenticación */
 import authRoutes from "./auth.routes.js";
 
+import matchRoutes from "./match.routes.js";
+
 /** Middleware de autenticación */
 import authenticationMiddleware from "../middlewares/authentication.middleware.js";
 import rutaBusqueda from "./busqueda.routes.js";
@@ -26,6 +28,8 @@ router.use("/alumnos", authenticationMiddleware, alumnoRoutes);
 router.use("/auth", authRoutes);
 
 router.use("/busqueda", authenticationMiddleware, rutaBusqueda);
+
+router.use("/match", authenticationMiddleware, matchRoutes);
 
 // Exporta el enrutador
 export default router;

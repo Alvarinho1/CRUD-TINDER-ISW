@@ -2,6 +2,7 @@ import { respondSuccess, respondError } from "../utils/resHandler.js";
 import { handleError } from "../utils/errorHandler.js";
 import AlumnoService from "../services/alumno.service.js";
 import { alumnoBodySchema } from "../schema/alumno.schema.js";
+import MatchService from "../services/match.service.js";
 
 async function getAlumnos(req, res) {
   try {
@@ -77,11 +78,21 @@ async function deleteAlumno(req, res) {
 async function likeAlumno(req, res) {
   try {
     const { alumnoId, likedAlumnoId } = req.body;
-    const [alumno, error] = await AlumnoService.likeAlumno(alumnoId, likedAlumnoId);
+    const [alumnoLiked, error] = await AlumnoService.likeAlumno(alumnoId, likedAlumnoId);
+
+    const [alumno, errorAlumno] = await AlumnoService.getAlumnoById(alumnoId);
+
+    //si alumnoId tiene un like de likedAlumnoId es un match, y guardas en match
+    console.log("Buscar match", likedAlumnoId, alumno.likes);
+    if (alumno && alumno.likes.find(like => like.alumnoId === likedAlumnoId)) {
+      console.log("Es un match", likedAlumnoId, alumno.likes);
+      const [match, errorMatch] = await MatchService.createMatch(alumnoId, likedAlumnoId);
+    }
+
 
     if (error) return respondError(req, res, 400, error);
 
-    respondSuccess(req, res, 200, alumno);
+    respondSuccess(req, res, 200, alumnoLiked);
   } catch (error) {
     handleError(error, "alumno.controller -> likeAlumno");
     respondError(req, res, 500, "Error interno del servidor");

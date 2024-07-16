@@ -49,6 +49,17 @@ async function getAlumnoByRut(rut) {
   }
 }
 
+async function getAlumnoById(id) {
+  try {
+    const alumno = await Alumno.findById(id).exec();
+    if (!alumno) return [null, "El alumno no existe"];
+    return [alumno, null];
+  } catch (error) {
+    handleError(error, "alumno.service -> getAlumnoById");
+    return [null, "Error al obtener el alumno"];
+  }
+}
+
 async function updateAlumno(rut, alumno) {
   try {
     const alumnoFound = await Alumno.findOne({ rut });
@@ -114,7 +125,7 @@ async function likeAlumno(alumnoId, likedAlumnoId) {
       }
 
       // Verificar si el likedAlumno ya ha recibido like del alumno
-      const likesIds = likedAlumno.likes.map(like => like.alumnoId.toString());
+      const likesIds = likedAlumno.likes.map(like => like.alumnoId?.toString());
       if (likesIds.includes(alumnoId)) {
           const errorMessage = "El alumno ya ha recibido like de esta persona";
           handleError(new Error(errorMessage), "likeAlumno - Like duplicado");
@@ -445,6 +456,7 @@ export default {
   getAlumnos,
   createAlumno,
   getAlumnoByRut,
+  getAlumnoById,
   updateAlumno,
   deleteAlumno,
   likeAlumno,
