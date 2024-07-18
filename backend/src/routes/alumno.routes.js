@@ -19,8 +19,6 @@ router.post("/like", isAlumnoOrAdmin, alumnoController.likeAlumno);
 router.post("/dislike", isAlumnoOrAdmin, alumnoController.dislikeAlumno);
 router.delete("/alumno/like", isAlumnoOrAdmin, alumnoController.removeLikeAlumno);
 router.delete("/alumno/dislike", isAlumnoOrAdmin, alumnoController.removeDislikeAlumno);
-router.post("/alumno/superlike", isAlumnoOrAdmin, alumnoController.superLikeAlumno);
-router.delete("/alumno/quitarsuperlike", isAlumnoOrAdmin, alumnoController.quitarSuperLikeAlumno);
 
 router.post("/alumno/destacarperfil", isAlumnoOrAdmin, alumnoController.destacarPerfilAlumno);
 router.delete("/alumno/quitardestacado", isAlumnoOrAdmin, alumnoController.quitarDestacadoPerfilAlumno);

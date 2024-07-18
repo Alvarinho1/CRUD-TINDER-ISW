@@ -85,9 +85,9 @@ async function BuscarDislikesAlumnorut(req, res) {
     }
 }
 
-async function RankingAlumnosLikes(req, res) {
+async function RankingAlumnos(req, res) {
     try {
-        const [alumno, error] = await BusquedaServicio.RankingAlumnosLikes();
+        const [alumno, error] = await BusquedaServicio.RankingAlumnos();
         if (error) return respondError(req, res, 400, error);
         if (!alumno) return respondError(req, res, 400, "No se encontró ningún alumno con likes");
         respondSuccess(req, res, 200, alumno);
@@ -97,33 +97,7 @@ async function RankingAlumnosLikes(req, res) {
     }
 }
 
-async function RankingAlumnosDislikes(req, res) {
-    try {
-        const [alumno, error] = await BusquedaServicio.RankingAlumnosDislikes();
-        if (error) return respondError(req, res, 400, error);
-        if (!alumno) return respondError(req, res, 400, "No se encontró ningún alumno con dislikes");
-        respondSuccess(req, res, 200, alumno);
-    } catch (error) {
-        handleError(error, "busqueda.controller -> RankingAlumnosDislikes");
-        respondError(req, res, 500, "Error interno del servidor");
-    }
-}
 
-async function BuscarSuperLikes(req, res) {
-    try {
-        const [alumnos, error] = await BusquedaServicio.BuscarSuperLikes();
-        if (error) {
-            return respondError(req, res, 400, error);
-        }
-        if (!alumnos || alumnos.length === 0) {
-            return respondError(req, res, 400, "No se encontraron alumnos con superlikes");
-        }
-        respondSuccess(req, res, 200, alumnos);
-    } catch (error) {
-        handleError(error, "busqueda.controller -> BuscarSuperLikes");
-        respondError(req, res, 500, "Error interno del servidor");
-    }
-}
 
 export default {
     BuscarDisponibles,
@@ -132,7 +106,5 @@ export default {
     BuscarDislikesAlumno,
     BuscarLikesAlumnorut,
     BuscarDislikesAlumnorut,
-    RankingAlumnosLikes,
-    RankingAlumnosDislikes,
-    BuscarSuperLikes
+    RankingAlumnos
 };

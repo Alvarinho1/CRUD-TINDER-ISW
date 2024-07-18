@@ -279,98 +279,6 @@ async function removeDislikeAlumno(alumnoId, dislikedAlumnoId) {
   }
 }
 
-async function superLikeAlumno(alumnoId, superlikedAlumnoId) {
-  try {
-      if (alumnoId === superlikedAlumnoId) {
-          return [null, "No puedes darte super like a ti mismo"];
-      }
-
-      console.log(`Intentando encontrar al alumno que da el super like con ID: ${alumnoId}`);
-      const alumno = await Alumno.findById(alumnoId);
-      if (!alumno) {
-          const errorMessage = "El alumno que da el super like no existe";
-          handleError(new Error(errorMessage), "superLikeAlumno - Alumno no encontrado");
-          return [null, errorMessage];
-      }
-
-      console.log(`Intentando encontrar al alumno que recibe el super like con ID: ${superlikedAlumnoId}`);
-      const superlikedAlumno = await Alumno.findById(superlikedAlumnoId);
-      if (!superlikedAlumno) {
-          const errorMessage = "El alumno que recibe el super like no existe";
-          handleError(new Error(errorMessage), "superLikeAlumno - Superliked alumno no encontrado");
-          return [null, errorMessage];
-      }
-
-      // Verificar si superlikedAlumno.superLikes existe y es un array
-      if (!superlikedAlumno.superLikes || !Array.isArray(superlikedAlumno.superLikes)) {
-          superlikedAlumno.superLikes = [];
-      }
-
-      // Verificar si el superlikedAlumno ya ha recibido super like del alumno
-      if (superlikedAlumno.superLikes.some(like => like.alumnoId.toString() === alumnoId)) {
-          const errorMessage = "Este alumno ya te ha dado super like";
-          handleError(new Error(errorMessage), "superLikeAlumno - Superlike duplicado");
-          return [null, errorMessage];
-      }
-
-      // Agregar el super like al superlikedAlumno
-      superlikedAlumno.superLikes.push({
-          alumnoId: alumnoId,
-          nombreCompleto: `${alumno.nombre} ${alumno.apellidos}`,
-      });
-
-      await superlikedAlumno.save();
-
-      return [superlikedAlumno, null];
-  } catch (error) {
-      if (error.name === 'CastError') {
-          handleError(error, 'superLikeAlumno - El ID no es válido, ingrese un ID válido');
-          return [null, 'El ID no es válido, ingrese un ID válido'];
-      }
-      handleError(error, "superLikeAlumno - Error interno del servidor");
-      return [null, "Error interno del servidor"];
-  }
-}
-
-
-async function quitarSuperLikeAlumno(alumnoId, superlikedAlumnoId) {
-  try {
-      const superlikedAlumno = await Alumno.findById(superlikedAlumnoId);
-      if (!superlikedAlumno) {
-          return [null, "El alumno que recibió el super like no existe"];
-      }
-
-      const alumno = await Alumno.findById(alumnoId);
-      if (!alumno) {
-          return [null, "El alumno que quita el super like no existe"];
-      }
-
-      // Verificar si superlikedAlumno.superLikes existe y es un array
-      if (!superlikedAlumno.superLikes || !Array.isArray(superlikedAlumno.superLikes)) {
-          return [null, "El alumno no ha recibido super like de nadie"];
-      }
-
-      // Buscar el índice del super like del alumno en superlikedAlumno.superLikes
-      const index = superlikedAlumno.superLikes.findIndex(like => like.alumnoId.toString() === alumnoId);
-      if (index === -1) {
-          return [null, "El alumno no ha recibido super like de este alumno"];
-      }
-
-      // Eliminar el super like del array de superLikes
-      const quitarAlumno = superlikedAlumno.superLikes[index];
-      superlikedAlumno.superLikes.splice(index, 1);
-      await superlikedAlumno.save();
-
-      return [superlikedAlumno, `Se ha quitado el super like de ${quitarAlumno.nombreCompleto} correctamente`];
-  } catch (error) {
-      if (error.name === 'CastError') {
-          handleError(error, 'quitarSuperLikeAlumno - El ID no es válido, ingrese un ID válido');
-          return [null, 'El ID no es válido, ingrese un ID válido'];
-      }
-      handleError(error, "quitarSuperLikeAlumno - Error interno del servidor");
-      return [null, "Error interno del servidor"];
-  }
-}
 
 async function destacarPerfilAlumno(alumnoId, destacarAlumnoId) {
   try {
@@ -463,8 +371,6 @@ export default {
   dislikeAlumno,
   removeLikeAlumno,
   removeDislikeAlumno,
-  superLikeAlumno,
-  quitarSuperLikeAlumno,
   destacarPerfilAlumno,
   quitarDestacadoPerfilAlumno,
 };
