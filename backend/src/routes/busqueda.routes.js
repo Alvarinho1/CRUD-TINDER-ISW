@@ -15,7 +15,7 @@ router.get("/likes", isAdmin, isAlumnoOrAdmin, BusquedaController.BuscarLikesAlu
 router.get("/dislikes", isAdmin, isAlumnoOrAdmin, BusquedaController.BuscarDislikesAlumno);
 router.get("/alumnos/likes/:rut", isAdmin, BusquedaController.BuscarLikesAlumnorut);
 router.get("/alumnos/dislikes/:rut", isAdmin, BusquedaController.BuscarDislikesAlumnorut);
-router.get("/alumnos/ranking", isAdmin, BusquedaController.RankingAlumnos);
+router.get("/alumnos/ranking", isAdmin,isAlumnoOrAdmin, BusquedaController.RankingAlumnos);
 
 
 export default router;
