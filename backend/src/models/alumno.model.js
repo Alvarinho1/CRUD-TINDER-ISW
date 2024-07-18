@@ -87,12 +87,6 @@ const alumnoSchema = new mongoose.Schema(
         ref: "Alumno",
       },
     ],
-    superLikes: [
-      {
-        type: mongoose.Schema.Types.Mixed,
-        ref: "Alumno",
-      },
-    ],
     destacado: {
       type: mongoose.Schema.Types.Mixed,
       ref: "Alumno",
