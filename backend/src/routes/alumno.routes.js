@@ -11,15 +11,9 @@ const router = Router();
 router.use(authenticationMiddleware);
 
 router.get("/", isAdmin, alumnoController.getAlumnos);
-<<<<<<< HEAD
-router.post("/", isAdmin, alumnoController.createAlumno);
+router.post("/", isAdmin, upload.single('fotoPerfil'), alumnoController.createAlumno);
 router.get("/:rut", isUser, alumnoController.getAlumnoByRut);
 router.put("/:rut", isUser, alumnoController.updateAlumno);
-=======
-router.post("/", isAdmin, upload.single('fotoPerfil'), alumnoController.createAlumno);
-router.get("/:rut", isAlumnoOrAdmin, alumnoController.getAlumnoByRut);
-router.put("/:rut", isAlumnoOrAdmin, alumnoController.updateAlumno);
->>>>>>> Alvaro
 router.delete("/:rut", isAdmin, alumnoController.deleteAlumno);
 
 router.post("/like", isUser, alumnoController.likeAlumno);
