@@ -4,13 +4,14 @@ import { Router } from "express";
 import alumnoController from "../controllers/alumno.controller.js";
 import { isAdmin, isAlumnoOrAdmin } from "../middlewares/authorization.middleware.js";
 import authenticationMiddleware from "../middlewares/authentication.middleware.js";
+import upload from "../config/multerConfig.js";
 
 const router = Router();
 
 router.use(authenticationMiddleware);
 
 router.get("/", isAdmin, alumnoController.getAlumnos);
-router.post("/", isAdmin, alumnoController.createAlumno);
+router.post("/", isAdmin, upload.single('fotoPerfil'), alumnoController.createAlumno);
 router.get("/:rut", isAlumnoOrAdmin, alumnoController.getAlumnoByRut);
 router.put("/:rut", isAlumnoOrAdmin, alumnoController.updateAlumno);
 router.delete("/:rut", isAdmin, alumnoController.deleteAlumno);

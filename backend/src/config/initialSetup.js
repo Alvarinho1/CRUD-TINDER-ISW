@@ -41,6 +41,7 @@ async function createUsers() {
 
     const admin = await Role.findOne({ name: "admin" });
     const user = await Role.findOne({ name: "user" });
+    const alumno = await Role.findOne({ name: "alumno" });
 
     await Promise.all([
       new User({
@@ -58,7 +59,7 @@ async function createUsers() {
         roles: admin._id,
       }).save(),
     ]);
-    console.log("* => Users creados exitosamente");
+    console.log("* => Users y alumno creados exitosamente");
   } catch (error) {
     console.error(error);
   }

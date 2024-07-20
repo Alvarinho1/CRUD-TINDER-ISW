@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-const alumnoBodySchema = Joi.object({
+const alumnoSchema = Joi.object({
   nombre: Joi.string().required().messages({
     "string.empty": "El nombre no puede estar vacío.",
     "any.required": "El nombre es obligatorio.",
@@ -21,7 +21,7 @@ const alumnoBodySchema = Joi.object({
     "any.required": "El rut es obligatorio.",
     "string.base": "El rut debe ser de tipo string.",
     "string.min": "El rut debe tener al menos 9 caracteres.",
-    "string.max": "El rut debe tener al menos 10 caracteres.",
+    "string.max": "El rut debe tener menos de 10 caracteres.",
     "string.pattern.base": "El rut tiene el formato XXXXXXXX-X, ejemplo: 12345678-9.",
   }),
   correo: Joi.string().pattern(/^[a-zA-Z0-9._%+-]+@alumnos\.ubiobio\.cl$/).required().messages({
@@ -86,8 +86,13 @@ const alumnoBodySchema = Joi.object({
     "any.required": "Las áreas de interés son obligatorias.",
     "string.base": "Cada área de interés debe ser de tipo string.",
   }),
+  password: Joi.string().pattern(new RegExp('^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$')).required().messages({
+    "string.empty": "La contraseña no puede estar vacía.",
+    "any.required": "La contraseña es obligatoria.",
+    "string.pattern.base": "La contraseña debe tener al menos 8 caracteres, incluyendo una letra, un número y un carácter especial.",
+  }),
 }).messages({
   "object.unknown": "No se permiten propiedades adicionales.",
 });
 
-export { alumnoBodySchema };
+export { alumnoSchema };
