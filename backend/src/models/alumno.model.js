@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
 // Crea el esquema de la colección 'alumnos'
 const alumnoSchema = new mongoose.Schema(
@@ -82,6 +83,12 @@ const alumnoSchema = new mongoose.Schema(
       },
     ],
     dislikes: [
+      {
+        type: mongoose.Schema.Types.Mixed,
+        ref: "Alumno",
+      },
+    ],
+    superLikes: [
       {
         type: mongoose.Schema.Types.Mixed,
         ref: "Alumno",

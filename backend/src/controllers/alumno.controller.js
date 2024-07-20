@@ -1,7 +1,7 @@
 import { respondSuccess, respondError } from "../utils/resHandler.js";
 import { handleError } from "../utils/errorHandler.js";
 import AlumnoService from "../services/alumno.service.js";
-import { alumnoBodySchema } from "../schema/alumno.schema.js";
+import { alumnoSchema } from "../schema/alumno.schema.js";
 import MatchService from "../services/match.service.js";
 
 async function getAlumnos(req, res) {
@@ -19,16 +19,29 @@ async function getAlumnos(req, res) {
 
 async function createAlumno(req, res) {
   try {
-    const { error: validationError } = alumnoBodySchema.validate(req.body);
+    const { error: validationError } = alumnoSchema.validate(req.body);
     if (validationError) return respondError(req, res, 400, validationError.details[0].message);
 
     const { body } = req;
+    const file = req.file;
+
+    if (file) {
+      body.fotoPerfil = file.path;
+    }
+
     const [newAlumno, error] = await AlumnoService.createAlumno(body);
 
     if (error) return respondError(req, res, 400, error);
 
     respondSuccess(req, res, 201, newAlumno);
   } catch (error) {
+    // Manejo de errores específicos de multer
+    if (error instanceof multer.MulterError) {
+      return respondError(req, res, 400, error.message);
+    } else if (error.message === 'Solo se permiten archivos .png y .jpg') {
+      return respondError(req, res, 400, error.message);
+    }
+
     respondError(req, res, 500, "Error interno del servidor");
   }
 }

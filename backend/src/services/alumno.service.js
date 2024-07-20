@@ -14,10 +14,12 @@ async function getAlumnos() {
 
 async function createAlumno(alumno) {
   try {
-    const { nombre, apellidos, genero, rut, correo, carrera, cursos, areasDeInteres } = alumno;
+    const { nombre, apellidos, genero, rut, correo, carrera, cursos, areasDeInteres, fotoPerfil, password } = alumno;
 
     const alumnoFound = await Alumno.findOne({ rut });
     if (alumnoFound) return [null, "El alumno ya existe"];
+
+    const encryptedPassword = await Alumno.encryptPassword(password);
 
     const newAlumno = new Alumno({
       nombre,
@@ -28,6 +30,8 @@ async function createAlumno(alumno) {
       carrera,
       cursos,
       areasDeInteres,
+      fotoPerfil, 
+      password: encryptedPassword 
     });
     await newAlumno.save();
 
@@ -77,6 +81,7 @@ async function updateAlumno(rut, alumno) {
         carrera,
         cursos,
         areasDeInteres,
+        fotoPerfil
       },
       { new: true },
     );
