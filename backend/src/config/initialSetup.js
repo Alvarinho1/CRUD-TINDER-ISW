@@ -77,12 +77,5 @@ async function createUsers() {
   }
 };
 
-const initializeDatabase = async () => {
-  await connectDB();
-  await createRoles();
-  await createUsers();
-};
-
-initializeDatabase();
 
 export { createRoles, createUsers };

@@ -1,11 +1,21 @@
 "use strict";
 
+
 import { respondSuccess, respondError } from "../utils/resHandler.js";
 import { handleError } from "../utils/errorHandler.js";
+
+/** Servicios de autenticación */
 import AuthService from "../services/auth.service.js";
 import { authLoginBodySchema, authRegisterBodySchema } from "../schema/auth.schema.js";
 import { alumnoSchema } from "../schema/alumno.schema.js"; // Importa el esquema de validación de alumnos
 
+/**
+ * Inicia sesión con un usuario.
+ * @async
+ * @function login
+ * @param {Object} req - Objeto de petición
+ * @param {Object} res - Objeto de respuesta
+ */
 async function login(req, res) {
   try {
     const { body } = req;
@@ -16,6 +26,7 @@ async function login(req, res) {
 
     if (errorToken) return respondError(req, res, 400, errorToken);
 
+    // * Existen más opciones de seguridad para las cookies *//
     res.cookie("jwt", refreshToken, {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
@@ -28,6 +39,7 @@ async function login(req, res) {
   }
 }
 
+<<<<<<< HEAD
 async function registerAlumno(req, res) {
   try {
     const { body } = req;
@@ -50,6 +62,8 @@ async function registerAlumno(req, res) {
   }
 }
 
+=======
+>>>>>>> Matias
 /**
  * @name logout
  * @description Cierra la sesión del usuario
@@ -91,9 +105,44 @@ async function refresh(req, res) {
   }
 }
 
+async function register(req, res) {
+  try {
+    const { body } = req;
+    const { error: bodyError } = authRegisterBodySchema.validate(body);
+    if (bodyError) return respondError(req, res, 400, bodyError.message);
+
+    const result = await AuthService.register(body);
+    if (result.error) return respondError(req, res, 400, result.error);
+
+    respondSuccess(req, res, 201, {
+      message: "Usuario registrado exitosamente",
+      accessToken: result.accessToken,
+    });
+
+  } catch (error) {
+    handleError(error, "auth.controller -> register");
+    respondError(req, res, 400, error.message);
+  }
+}
+
+async function getProfile(req, res) {
+  try {
+    const { userId } = req.params;
+
+    const userProfile = await AuthService.getProfile(userId);
+    if (!userProfile) return respondError(req, res, 404, "Perfil no encontrado");
+
+    respondSuccess(req, res, 200, { profile: userProfile });
+  } catch (error) {
+    handleError(error, "auth.controller -> getProfile");
+    respondError(req, res, 400, error.message);
+  }
+}
+
 export default {
   login,
   logout,
   refresh,
-  registerAlumno,
+  register,
+  getProfile
 };

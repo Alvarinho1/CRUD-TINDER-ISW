@@ -10,9 +10,10 @@ const router = Router();
 
 // Define las rutas para la autenticación
 router.post("/login", authController.login);
+router.post("/register", authController.register);
 router.post("/logout", authController.logout);
 router.get("/refresh", authController.refresh);
-router.post("/register", authController.registerAlumno);
+router.get("/getProfile", authController.refresh);
 
 // Exporta el enrutador
 export default router;
