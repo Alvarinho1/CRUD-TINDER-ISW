@@ -45,24 +45,44 @@ async function createUsers() {
 
     await Promise.all([
       new User({
-        username: "user",
-        email: "user@email.com",
-        rut: "12345678-9",
-        password: await User.encryptPassword("user123"),
+        username: 'user',
+        email: 'user@email.com',
+        rut: '12345678-9',
+        password: await User.encryptPassword('user123'),
         roles: user._id,
       }).save(),
       new User({
-        username: "admin",
-        email: "admin@email.com",
-        rut: "12345678-0",
-        password: await User.encryptPassword("admin123"),
+        username: 'admin',
+        email: 'admin@email.com',
+        rut: '12345678-0',
+        password: await User.encryptPassword('admin123'),
         roles: admin._id,
       }).save(),
+      new Alumno({
+        nombre: 'Juan',
+        apellidos: 'Pérez',
+        genero: 'masculino',
+        rut: '12345678-1',
+        correo: 'juan.perez@alumnos.ubiobio.cl',
+        carrera: 'Ingeniería Civil',
+        cursos: ['Matemáticas', 'Física'],
+        areasDeInteres: ['Programación', 'Electrónica'],
+        password: await Alumno.encryptPassword('alumno123'),
+        roles: [alumno._id],
+      }).save(),
     ]);
-    console.log("* => Users y alumno creados exitosamente");
+    console.log('* => Users y alumno creados exitosamente');
   } catch (error) {
     console.error(error);
   }
-}
+};
+
+const initializeDatabase = async () => {
+  await connectDB();
+  await createRoles();
+  await createUsers();
+};
+
+initializeDatabase();
 
 export { createRoles, createUsers };
