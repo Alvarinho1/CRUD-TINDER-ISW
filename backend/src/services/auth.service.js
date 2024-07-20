@@ -1,117 +1,100 @@
-"use strict";
-
 import User from "../models/user.model.js";
-import Role from "../models/role.model.js";
 import Alumno from "../models/alumno.model.js";
 import jwt from "jsonwebtoken";
-import { ACCESS_JWT_SECRET, REFRESH_JWT_SECRET } from "../config/configEnv.js";
-import { handleError } from "../utils/errorHandler.js";
+import config from "../config";
+import Role from "../models/role.model.js"; // Importa el modelo de Role
 
-async function login(user) {
-  try {
-    const { email, password } = user;
-    const userFound = await User.findOne({ email }).populate("roles").exec();
-    if (!userFound) return [null, null, "El usuario y/o contraseña son incorrectos"];
+// Login de Usuario
+async function login(body) {
+  const { correo, password } = body;
 
-    const matchPassword = await User.comparePassword(password, userFound.password);
-    if (!matchPassword) return [null, null, "El usuario y/o contraseña son incorrectos"];
+  let user = await User.findOne({ correo }).populate("roles");
+  let alumno = await Alumno.findOne({ correo }).populate("roles");
 
-    const accessToken = jwt.sign(
-      { email: userFound.email, roles: userFound.roles },
-      ACCESS_JWT_SECRET,
-      { expiresIn: "1d" }
-    );
-
-    const refreshToken = jwt.sign(
-      { email: userFound.email },
-      REFRESH_JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    return [accessToken, refreshToken, null];
-  } catch (error) {
-    handleError(error, "auth.service -> login");
-    return [null, null, "Error al iniciar sesión"];
+  let userType = "user"; // Default user type
+  if (alumno) {
+    user = alumno;
+    userType = "alumno";
   }
+
+  if (!user) return [null, null, "Usuario no encontrado"];
+
+  const matchPassword = await (userType === "alumno"
+    ? Alumno.comparePassword(password, user.password)
+    : User.comparePassword(password, user.password));
+
+  if (!matchPassword) return [null, null, "Contraseña inválida"];
+
+  const accessToken = jwt.sign({ id: user._id, type: userType }, config.SECRET, {
+    expiresIn: "15m",
+  });
+
+  const refreshToken = jwt.sign({ id: user._id, type: userType }, config.SECRET, {
+    expiresIn: "7d",
+  });
+
+  return [accessToken, refreshToken, null];
 }
 
-async function registerAlumno(alumno) {
-  try {
-    const { nombre, apellidos, genero, rut, correo, carrera, cursos, areasDeInteres, password } = alumno;
+// Registro de Alumno
+async function registerAlumno(body) {
+  const { nombre, apellidos, genero, rut, correo, carrera, cursos, areasDeInteres, password } = body;
 
-    const alumnoFound = await Alumno.findOne({ rut });
-    if (alumnoFound) return [null, null, null, "El alumno ya existe"];
+  const alumnoFound = await Alumno.findOne({ rut });
+  if (alumnoFound) return [null, null, null, "El alumno ya existe"];
 
-    const newAlumno = new Alumno({
-      nombre,
-      apellidos,
-      genero,
-      rut,
-      correo,
-      carrera,
-      cursos,
-      areasDeInteres,
-    });
-    await newAlumno.save();
+  const encryptedPassword = await Alumno.encryptPassword(password);
 
-    const userRole = await Role.findOne({ name: "alumno" });
-    const newUser = new User({
-      username: nombre,
-      rut,
-      email: correo,
-      password: await User.encryptPassword(password),
-      roles: [userRole._id],
-    });
-    await newUser.save();
+  const role = await Role.findOne({ name: "alumno" });
 
-    const accessToken = jwt.sign(
-      { email: newUser.email, roles: newUser.roles },
-      ACCESS_JWT_SECRET,
-      { expiresIn: "1d" }
-    );
+  const newAlumno = new Alumno({
+    nombre,
+    apellidos,
+    genero,
+    rut,
+    correo,
+    carrera,
+    cursos,
+    areasDeInteres,
+    password: encryptedPassword,
+    roles: [role._id],
+  });
 
-    const refreshToken = jwt.sign(
-      { email: newUser.email },
-      REFRESH_JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+  await newAlumno.save();
 
-    return [newAlumno, accessToken, refreshToken, null];
-  } catch (error) {
-    handleError(error, "auth.service -> registerAlumno");
-    return [null, null, null, error.message];
-  }
+  const accessToken = jwt.sign({ id: newAlumno._id, type: "alumno" }, config.SECRET, {
+    expiresIn: "15m",
+  });
+
+  const refreshToken = jwt.sign({ id: newAlumno._id, type: "alumno" }, config.SECRET, {
+    expiresIn: "7d",
+  });
+
+  return [newAlumno, accessToken, refreshToken, null];
 }
 
 async function refresh(cookies) {
+  const refreshToken = cookies.jwt;
+
   try {
-    if (!cookies.jwt) return [null, "No hay autorización"];
-    const refreshToken = cookies.jwt;
+    const decoded = jwt.verify(refreshToken, config.SECRET);
+    const userType = decoded.type;
 
-    const accessToken = await jwt.verify(
-      refreshToken,
-      REFRESH_JWT_SECRET,
-      async (err, user) => {
-        if (err) return [null, "La sesión ha caducado, vuelva a iniciar sesión"];
+    const user = await (userType === "alumno" ? Alumno.findById(decoded.id) : User.findById(decoded.id));
+    if (!user) return [null, "Usuario no encontrado"];
 
-        const userFound = await User.findOne({ email: user.email }).populate("roles").exec();
-        if (!userFound) return [null, "Usuario no autorizado"];
+    const accessToken = jwt.sign({ id: user._id, type: userType }, config.SECRET, {
+      expiresIn: "15m",
+    });
 
-        const accessToken = jwt.sign(
-          { email: userFound.email, roles: userFound.roles },
-          ACCESS_JWT_SECRET,
-          { expiresIn: "1d" }
-        );
-
-        return [accessToken, null];
-      }
-    );
-
-    return accessToken;
+    return [accessToken, null];
   } catch (error) {
-    handleError(error, "auth.service -> refresh");
-    return [null, "Error al refrescar el token"];
+    return [null, "Token inválido"];
   }
 }
 
-export default { login, registerAlumno, refresh };
+export default {
+  login,
+  registerAlumno,
+  refresh,
+};

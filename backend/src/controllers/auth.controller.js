@@ -4,6 +4,7 @@ import { respondSuccess, respondError } from "../utils/resHandler.js";
 import { handleError } from "../utils/errorHandler.js";
 import AuthService from "../services/auth.service.js";
 import { authLoginBodySchema, authRegisterBodySchema } from "../schema/auth.schema.js";
+import { alumnoSchema } from "../schema/alumno.schema.js"; // Importa el esquema de validación de alumnos
 
 async function login(req, res) {
   try {
@@ -11,8 +12,7 @@ async function login(req, res) {
     const { error: bodyError } = authLoginBodySchema.validate(body);
     if (bodyError) return respondError(req, res, 400, bodyError.message);
 
-    const [accessToken, refreshToken, errorToken] =
-      await AuthService.login(body);
+    const [accessToken, refreshToken, errorToken] = await AuthService.login(body);
 
     if (errorToken) return respondError(req, res, 400, errorToken);
 
@@ -31,7 +31,7 @@ async function login(req, res) {
 async function registerAlumno(req, res) {
   try {
     const { body } = req;
-    const { error: bodyError } = authRegisterBodySchema.validate(body);
+    const { error: bodyError } = alumnoSchema.validate(body); // Usar el esquema de alumnos para validar
     if (bodyError) return respondError(req, res, 400, bodyError.message);
 
     const [newAlumno, accessToken, refreshToken, error] = await AuthService.registerAlumno(body);
