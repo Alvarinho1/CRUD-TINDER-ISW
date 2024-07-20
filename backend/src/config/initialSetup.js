@@ -36,30 +36,46 @@ async function createUsers() {
     const admin = await Role.findOne({ name: "admin" });
     const user = await Role.findOne({ name: "user" });
 
-    if (!admin || !user) {
-      throw new Error("No se encontraron los roles necesarios");
-    }
-
     await Promise.all([
       new User({
         username: "user",
         email: "user@email.com",
         rut: "12345678-9",
         password: await User.encryptPassword("user123"),
-        roles: [user._id], // Asigna el rol de "user"
+        roles: user._id,
       }).save(),
       new User({
         username: "admin",
         email: "admin@email.com",
         rut: "12345678-0",
         password: await User.encryptPassword("admin123"),
-        roles: [admin._id], // Asigna el rol de "admin"
+        roles: admin._id,
+      }).save(),
+      new Alumno({
+        nombre: 'Juan',
+        apellidos: 'Pérez',
+        genero: 'masculino',
+        rut: '12345678-1',
+        correo: 'juan.perez@alumnos.ubiobio.cl',
+        carrera: 'Ingeniería Civil',
+        cursos: ['Matemáticas', 'Física'],
+        areasDeInteres: ['Programación', 'Electrónica'],
+        password: await Alumno.encryptPassword('alumno123'),
+        roles: [alumno._id],
       }).save(),
     ]);
-    console.log("* => Users creados exitosamente");
+    console.log('* => Users y alumno creados exitosamente');
   } catch (error) {
     console.error("Error al crear usuarios:", error);
   }
-}
+};
+
+const initializeDatabase = async () => {
+  await connectDB();
+  await createRoles();
+  await createUsers();
+};
+
+initializeDatabase();
 
 export { createRoles, createUsers };
