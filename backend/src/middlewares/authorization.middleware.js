@@ -1,5 +1,5 @@
 "use strict";
-// Autorizacion - Comprobar el rol del usuario
+// Autorización - Comprobar el rol del usuario
 import User from "../models/user.model.js";
 import Role from "../models/role.model.js";
 import { respondError } from "../utils/resHandler.js";
@@ -13,45 +13,40 @@ import { handleError } from "../utils/errorHandler.js";
  */
 async function isAdmin(req, res, next) {
   try {
-    const user = await User.findOne({ email: req.email });
-    const roles = await Role.find({ _id: { $in: user.roles } });
-    for (let i = 0; i < roles.length; i++) {
-      if (roles[i].name === "admin") {
-        next();
-        return;
-      }
+    const user = await User.findOne({ email: req.email }).populate("roles");
+    if (!user) return respondError(req, res, 404, "Usuario no encontrado");
+
+    const isAdmin = user.roles.some(role => role.name === "admin");
+    if (isAdmin) {
+      next();
+    } else {
+      respondError(req, res, 401, "Se requiere un rol de administrador para realizar esta acción");
     }
-    return respondError(
-      req,
-      res,
-      401,
-      "Se requiere un rol de administrador para realizar esta acción",
-    );
   } catch (error) {
     handleError(error, "authorization.middleware -> isAdmin");
   }
 }
 
-async function isAlumnoOrAdmin(req, res, next) {
+/**
+ * Comprueba si el usuario es usuario
+ * @param {Object} req - Objeto de petición
+ * @param {Object} res - Objeto de respuesta
+ * @param {Function} next - Función para continuar con la siguiente función
+ */
+async function isUser(req, res, next) {
   try {
-    const user = await User.findOne({ email: req.email });
-    const roles = await Role.find({ _id: { $in: user.roles } });
-    const isAdmin = roles.some(role => role.name === "admin");
+    const user = await User.findOne({ email: req.email }).populate("roles");
+    if (!user) return respondError(req, res, 404, "Usuario no encontrado");
 
-    if (isAdmin || req.params.rut === user.rut) {
+    const isUser = user.roles.some(role => role.name === "user"); // Asegúrate de que "user" es el nombre correcto del rol
+    if (isUser) {
       next();
-      return;
+    } else {
+      respondError(req, res, 401, "Se requiere un rol de usuario para realizar esta acción");
     }
-    return respondError(
-      req,
-      res,
-      401,
-      "No autorizado para realizar esta acción",
-    );
   } catch (error) {
-    handleError(error, "authorization.middleware -> isAlumnoOrAdmin");
+    handleError(error, "authorization.middleware -> isUser");
   }
 }
 
-
-export { isAdmin, isAlumnoOrAdmin };
+export { isAdmin, isUser };

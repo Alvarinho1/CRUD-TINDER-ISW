@@ -1,21 +1,31 @@
 "use strict";
 
+
 import { respondSuccess, respondError } from "../utils/resHandler.js";
 import { handleError } from "../utils/errorHandler.js";
+
+/** Servicios de autenticación */
 import AuthService from "../services/auth.service.js";
 import { authLoginBodySchema, authRegisterBodySchema } from "../schema/auth.schema.js";
 
+/**
+ * Inicia sesión con un usuario.
+ * @async
+ * @function login
+ * @param {Object} req - Objeto de petición
+ * @param {Object} res - Objeto de respuesta
+ */
 async function login(req, res) {
   try {
     const { body } = req;
     const { error: bodyError } = authLoginBodySchema.validate(body);
     if (bodyError) return respondError(req, res, 400, bodyError.message);
 
-    const [accessToken, refreshToken, errorToken] =
-      await AuthService.login(body);
+    const [accessToken, refreshToken, errorToken] = await AuthService.login(body);
 
     if (errorToken) return respondError(req, res, 400, errorToken);
 
+    // * Existen más opciones de seguridad para las cookies *//
     res.cookie("jwt", refreshToken, {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
@@ -25,28 +35,6 @@ async function login(req, res) {
   } catch (error) {
     handleError(error, "auth.controller -> login");
     respondError(req, res, 400, error.message);
-  }
-}
-
-async function registerAlumno(req, res) {
-  try {
-    const { body } = req;
-    const { error: bodyError } = authRegisterBodySchema.validate(body);
-    if (bodyError) return respondError(req, res, 400, bodyError.message);
-
-    const [newAlumno, accessToken, refreshToken, error] = await AuthService.registerAlumno(body);
-
-    if (error) return respondError(req, res, 400, error);
-
-    res.cookie("jwt", refreshToken, {
-      httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
-    });
-
-    respondSuccess(req, res, 201, { newAlumno, accessToken });
-  } catch (error) {
-    handleError(error, "auth.controller -> registerAlumno");
-    respondError(req, res, 500, "Error interno del servidor");
   }
 }
 
@@ -91,9 +79,44 @@ async function refresh(req, res) {
   }
 }
 
+async function register(req, res) {
+  try {
+    const { body } = req;
+    const { error: bodyError } = authRegisterBodySchema.validate(body);
+    if (bodyError) return respondError(req, res, 400, bodyError.message);
+
+    const result = await AuthService.register(body);
+    if (result.error) return respondError(req, res, 400, result.error);
+
+    respondSuccess(req, res, 201, {
+      message: "Usuario registrado exitosamente",
+      accessToken: result.accessToken,
+    });
+
+  } catch (error) {
+    handleError(error, "auth.controller -> register");
+    respondError(req, res, 400, error.message);
+  }
+}
+
+async function getProfile(req, res) {
+  try {
+    const { userId } = req.params;
+
+    const userProfile = await AuthService.getProfile(userId);
+    if (!userProfile) return respondError(req, res, 404, "Perfil no encontrado");
+
+    respondSuccess(req, res, 200, { profile: userProfile });
+  } catch (error) {
+    handleError(error, "auth.controller -> getProfile");
+    respondError(req, res, 400, error.message);
+  }
+}
+
 export default {
   login,
   logout,
   refresh,
-  registerAlumno,
+  register,
+  getProfile
 };

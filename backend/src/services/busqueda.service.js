@@ -3,22 +3,22 @@ import { handleError } from "../utils/errorHandler.js";
 
 async function BuscarDisponibles() {
     try {
-        // Obtener todos los alumnos
+      
         const todosLosAlumnos = await Alumno.find().lean();
 
-        // Ordenar todos los alumnos por puntos en orden descendente
+    
         todosLosAlumnos.sort((a, b) => {
             const puntosA = calcularPuntos(a.likes);
             const puntosB = calcularPuntos(b.likes);
             return puntosB - puntosA;
         });
 
-        // Función para calcular los puntos de un alumno
+       
         function calcularPuntos(likes) {
             return (likes ? likes.length : 0) * 50;
         }
 
-        // Agrupar alumnos por cantidad de puntos
+      
         const alumnosPorPuntos = {};
         todosLosAlumnos.forEach(alumno => {
             const puntos = calcularPuntos(alumno.likes);
@@ -28,12 +28,12 @@ async function BuscarDisponibles() {
             alumnosPorPuntos[puntos].push(alumno);
         });
 
-        // Ordenar las listas de alumnos con la misma cantidad de puntos de forma aleatoria
+        
         Object.keys(alumnosPorPuntos).forEach(puntos => {
             shuffleArray(alumnosPorPuntos[puntos]);
         });
 
-        // Concatenar los alumnos ordenados por puntos de forma aleatoria
+     
         let disponibles = [];
         Object.keys(alumnosPorPuntos).sort((a, b) => b - a).forEach(puntos => {
             disponibles = [...disponibles, ...alumnosPorPuntos[puntos]];
@@ -50,7 +50,7 @@ async function BuscarDisponibles() {
     }
 }
 
-// Función auxiliar para mezclar un array de forma aleatoria
+
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -90,10 +90,10 @@ async function BuscarLikesAlumno() {
             return [null, "No hay ningún alumno con likes"];
         }
 
-        // Usar populate para obtener los datos de los likes de cada alumno
+     
         const populatedAlumnos = await Alumno.populate(alumnos, { path: "likes.alumnoId", select: "id nombre apellidos" });
 
-        // Procesar y devolver los datos como desees
+ 
         return [populatedAlumnos, null];
     } catch (error) {
         handleError(error, "busqueda.service -> BuscarLikesAlumno");
@@ -113,10 +113,10 @@ async function BuscarDislikesAlumno() {
             return [null, "No hay ningún alumno con dislikes"];
         }
 
-        // Usar populate para obtener los datos de los dislikes de cada alumno
+
         const populatedAlumnos = await Alumno.populate(alumnos, { path: "dislikes.alumnoId", select: "id nombre apellidos" });
 
-        // Procesar y devolver los datos como desees
+
         return [populatedAlumnos, null];
     } catch (error) {
         handleError(error, "busqueda.service -> BuscarDislikesAlumno");
@@ -134,10 +134,10 @@ async function BuscarLikesAlumnorut(rut) {
             return [null, "El alumno no tiene likes"];
         }
 
-        // Usar populate para obtener los datos de los likes
+      
         const populatedAlumno = await Alumno.populate(alumno, { path: "likes.alumnoId", select: "id nombre apellidos" });
 
-        // Procesar y devolver los datos como desees
+      
         return [populatedAlumno, null];
     } catch (error) {
         handleError(error, "busqueda.service -> BuscarLikesAlumnorut");
@@ -155,10 +155,10 @@ async function BuscarDislikesAlumnorut(rut) {
             return [null, "El alumno no tiene dislikes"];
         }
 
-        // Usar populate para obtener los datos de los dislikes
+       
         const populatedAlumno = await Alumno.populate(alumno, { path: "dislikes.alumnoId", select: "id nombre apellidos" });
 
-        // Procesar y devolver los datos como desees
+       
         return [populatedAlumno, null];
     } catch (error) {
         handleError(error, "busqueda.service -> BuscarDislikesAlumnorut");
@@ -170,23 +170,23 @@ async function BuscarDislikesAlumnorut(rut) {
 async function RankingAlumnos() {
     try {
         const rankingAlumnosLikes = await Alumno.aggregate([
-            // Agregar campo likes y calcular su tamaño (cantidad de likes)
+           
             { $addFields: { 
                 likes: { $ifNull: ["$likes", []] }
             } },
-            // Proyectar nombre, apellidos, rut, y calcular puntos basados en la cantidad de likes
+            
             { 
                 $project: { 
                     nombre: 1, 
                     apellidos: 1, 
                     rut: 1, 
-                    likeCount: { $size: "$likes" }, // Cantidad de likes
-                    points: { $multiply: [{ $size: "$likes" }, 50] } // Calcular puntos (50 puntos por like)
+                    likeCount: { $size: "$likes" }, 
+                    points: { $multiply: [{ $size: "$likes" }, 50] }
                 } 
             },
-            // Ordenar por puntos en orden descendente
+          
             { $sort: { points: -1 } },
-            // Limitar a los primeros 10 resultados
+          
             { $limit: 10 }
         ]);
 

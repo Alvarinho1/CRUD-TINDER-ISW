@@ -6,7 +6,7 @@ import { Router } from "express";
 import usuarioController from "../controllers/user.controller.js";
 
 /** Middlewares de autorización */
-import { isAdmin, isAlumnoOrAdmin } from "../middlewares/authorization.middleware.js";
+import { isAdmin, isUser } from "../middlewares/authorization.middleware.js";
 
 /** Middleware de autenticación */
 import authenticationMiddleware from "../middlewares/authentication.middleware.js";
@@ -19,7 +19,7 @@ router.use(authenticationMiddleware);
 // Define las rutas para los usuarios
 router.get("/", isAdmin, usuarioController.getUsers);
 router.post("/", isAdmin, usuarioController.createUser);
-router.get("/:id", isAlumnoOrAdmin, usuarioController.getUserById);
+router.get("/:id", isUser, usuarioController.getUserById);
 router.put("/:id", isAdmin, usuarioController.updateUser);
 router.delete("/:id", isAdmin, usuarioController.deleteUser);
 

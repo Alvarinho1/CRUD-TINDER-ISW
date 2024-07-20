@@ -64,8 +64,8 @@
 
 - Una vez instaladas las dependencias y configuradas las variables de entorno, puedes correr el servidor con `npm start`
 - Recuerda que **debes utilizar** Postman o Insomnia para hacer las peticiones a la API
-- De manera automatica se creara un usuario administrador y user, con los siguientes datos:
-  - **Administrador**
+- De manera automatica se creara un usuario admin y user, con los siguientes datos:
+  - **admin**
     - `email: admin@email.com`
     - `password: admin123`
   - **User**
