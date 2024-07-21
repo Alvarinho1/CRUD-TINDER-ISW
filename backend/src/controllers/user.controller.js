@@ -95,20 +95,20 @@ async function deleteUser(req, res) {
   }
 }
 
-// Dar un "like" a un usuario
 async function likeUser(req, res) {
   try {
     const { userId, likedUserId } = req.body;
     const [userLiked, error] = await UserService.likeUser(userId, likedUserId);
 
-    const [user, errorUser] = await UserService.getUserByRut(userId);
+    const [user, errorUser] = await UserService.getUserById(userId);
 
-    // Si userId tiene un like de likedUserId es un match, y guardas en match
+    //si alumnoId tiene un like de likedAlumnoId es un match, y guardas en match
     console.log("Buscar match", likedUserId, user.likes);
     if (user && user.likes.find(like => like.userId === likedUserId)) {
       console.log("Es un match", likedUserId, user.likes);
       const [match, errorMatch] = await MatchService.createMatch(userId, likedUserId);
     }
+
 
     if (error) return respondError(req, res, 400, error);
 
@@ -119,7 +119,7 @@ async function likeUser(req, res) {
   }
 }
 
-// Dar un "dislike" a un usuario
+
 async function dislikeUser(req, res) {
   try {
     const { userId, dislikedUserId } = req.body;

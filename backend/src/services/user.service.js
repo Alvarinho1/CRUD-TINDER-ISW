@@ -120,7 +120,6 @@ async function updateUser(rut, user) {
   }
 }
 
-
 async function deleteUser(rut) {
   try {
     const user = await User.findOneAndDelete({ rut });
@@ -132,32 +131,24 @@ async function deleteUser(rut) {
   }
 }
 
-async function likeUser(userId, likedUserId, roles) {
+async function likeUser(userId, likedUserId) {
   try {
     if (userId === likedUserId) {
       return [null, "No puedes darte like a ti mismo"];
     }
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).exec();
     if (!user) {
-      const errorMessage = "El usuario que da el like no existe";
-      handleError(new Error(errorMessage), "likeUser - Usuario no encontrado");
+      const errorMessage = "El alumno que da el like no existe";
+      handleError(new Error(errorMessage), "likeUser - Alumno no encontrado");
       return [null, errorMessage];
     }
 
-    const likedUser = await User.findById(likedUserId);
+    const likedUser = await User.findById(likedUserId).exec();
     if (!likedUser) {
-      const errorMessage = "El usuario que recibe el like no existe";
-      handleError(new Error(errorMessage), "likeUser - Usuario recibido no encontrado");
+      const errorMessage = "El alumno que recibe el like no existe";
+      handleError(new Error(errorMessage), "likeUser - Liked alumno no encontrado");
       return [null, errorMessage];
-    }
-
-    // Verificar que el usuario que da el like tiene uno de los roles adecuados
-    const rolesFound = await Role.find({ name: { $in: roles } });
-    if (rolesFound.length === 0) return [null, "No existen los roles proporcionados"];
-    const roleIds = rolesFound.map(role => role._id.toString());
-    if (!user.roles.some(roleId => roleIds.includes(roleId.toString()))) {
-      return [null, "El usuario no tiene uno de los roles necesarios para dar like"];
     }
 
     if (!likedUser.likes || !Array.isArray(likedUser.likes)) {
@@ -166,8 +157,8 @@ async function likeUser(userId, likedUserId, roles) {
 
     const likesIds = likedUser.likes.map(like => like.userId?.toString());
     if (likesIds.includes(userId)) {
-      const errorMessage = "El usuario ya ha recibido like de esta persona";
-      handleError(new Error(errorMessage), "likeUser - Like duplicado");
+      const errorMessage = "El alumno ya ha recibido like de esta persona";
+      handleError(new Error(errorMessage), "likeuser - Like duplicado");
       return [null, errorMessage];
     }
 
@@ -189,50 +180,49 @@ async function likeUser(userId, likedUserId, roles) {
   }
 }
 
-async function dislikeUser(userId, dislikedUserId, roles) {
+async function dislikeUser(userId, dislikedUserId) {
   try {
+    // Verifica que el usuario no se esté dando dislike a sí mismo
     if (userId === dislikedUserId) {
       return [null, "No puedes darte dislike a ti mismo"];
     }
 
-    const user = await User.findById(userId);
+    // Busca el usuario que da el dislike
+    const user = await User.findById(userId).exec();
     if (!user) {
-      const errorMessage = "El usuario que da el dislike no existe";
+      const errorMessage = "alumno que da el dislike no existe";
       handleError(new Error(errorMessage), "dislikeUser - Usuario no encontrado");
       return [null, errorMessage];
     }
 
-    const dislikedUser = await User.findById(dislikedUserId);
+    // Busca el usuario que recibe el dislike
+    const dislikedUser = await User.findById(dislikedUserId).exec();
     if (!dislikedUser) {
-      const errorMessage = "El usuario que recibe el dislike no existe";
+      const errorMessage = "El alumno que recibe el dislike no existe";
       handleError(new Error(errorMessage), "dislikeUser - Usuario recibido no encontrado");
       return [null, errorMessage];
     }
 
-    // Verificar que el usuario que da el dislike tiene uno de los roles adecuados
-    const rolesFound = await Role.find({ name: { $in: roles } });
-    if (rolesFound.length === 0) return [null, "No existen los roles proporcionados"];
-    const roleIds = rolesFound.map(role => role._id.toString());
-    if (!user.roles.some(roleId => roleIds.includes(roleId.toString()))) {
-      return [null, "El usuario no tiene uno de los roles necesarios para dar dislike"];
-    }
-
+    // Inicializa el arreglo de dislikes si no existe
     if (!dislikedUser.dislikes || !Array.isArray(dislikedUser.dislikes)) {
       dislikedUser.dislikes = [];
     }
 
+    // Verifica si el usuario ya ha dado dislike a esta persona
     const dislikedUserIds = dislikedUser.dislikes.map(dislike => dislike.userId.toString());
-    if (dislikedUserIds.includes(userId)) {
-      const errorMessage = "El usuario ya ha dado dislike a esta persona";
+    if (dislikedUserIds.includes(userId.toString())) {
+      const errorMessage = "El alumno ya ha dado dislike a esta persona";
       handleError(new Error(errorMessage), "dislikeUser - Dislike duplicado");
       return [null, errorMessage];
     }
 
+    // Agrega el dislike al usuario
     dislikedUser.dislikes.push({
       userId: userId,
       nombreCompleto: `${user.nombre} ${user.apellidos}`,
     });
 
+    // Guarda los cambios
     await dislikedUser.save();
 
     return [dislikedUser, null];
@@ -246,7 +236,7 @@ async function dislikeUser(userId, dislikedUserId, roles) {
   }
 }
 
-async function removeLikeUser(userId, likedUserId, roles) {
+async function removeLikeUser(userId, likedUserId) {
   try {
     const user = await User.findById(userId);
     if (!user) {
@@ -256,14 +246,6 @@ async function removeLikeUser(userId, likedUserId, roles) {
     const likedUser = await User.findById(likedUserId);
     if (!likedUser) {
       return [null, "El usuario que da el like no existe"];
-    }
-
-    // Verificar que el usuario que realiza la acción tiene uno de los roles adecuados
-    const rolesFound = await Role.find({ name: { $in: roles } });
-    if (rolesFound.length === 0) return [null, "No existen los roles proporcionados"];
-    const roleIds = rolesFound.map(role => role._id.toString());
-    if (!user.roles.some(roleId => roleIds.includes(roleId.toString()))) {
-      return [null, "El usuario no tiene uno de los roles necesarios para eliminar el like"];
     }
 
     if (!likedUser.likes || !Array.isArray(likedUser.likes)) {
@@ -289,7 +271,7 @@ async function removeLikeUser(userId, likedUserId, roles) {
   }
 }
 
-async function removeDislikeUser(userId, dislikedUserId, roles) {
+async function removeDislikeUser(userId, dislikedUserId) {
   try {
     const user = await User.findById(userId);
     if (!user) {
@@ -299,14 +281,6 @@ async function removeDislikeUser(userId, dislikedUserId, roles) {
     const dislikedUser = await User.findById(dislikedUserId);
     if (!dislikedUser) {
       return [null, "El usuario que quita el dislike no existe"];
-    }
-
-    // Verificar que el usuario que realiza la acción tiene uno de los roles adecuados
-    const rolesFound = await Role.find({ name: { $in: roles } });
-    if (rolesFound.length === 0) return [null, "No existen los roles proporcionados"];
-    const roleIds = rolesFound.map(role => role._id.toString());
-    if (!user.roles.some(roleId => roleIds.includes(roleId.toString()))) {
-      return [null, "El usuario no tiene uno de los roles necesarios para eliminar el dislike"];
     }
 
     if (!dislikedUser.dislikes || !Array.isArray(dislikedUser.dislikes)) {
@@ -332,7 +306,7 @@ async function removeDislikeUser(userId, dislikedUserId, roles) {
   }
 }
 
-async function destacarPerfilUser(userId, destacarUserId, roles) {
+async function destacarPerfilUser(userId, destacarUserId) {
   try {
     const user = await User.findById(userId);
     if (!user) {
@@ -346,14 +320,6 @@ async function destacarPerfilUser(userId, destacarUserId, roles) {
     const destacarUser = await User.findById(destacarUserId);
     if (!destacarUser) {
       return [null, "El usuario a destacar no existe"];
-    }
-
-    // Verificar que el usuario que realiza la acción tiene uno de los roles adecuados
-    const rolesFound = await Role.find({ name: { $in: roles } });
-    if (rolesFound.length === 0) return [null, "No existen los roles proporcionados"];
-    const roleIds = rolesFound.map(role => role._id.toString());
-    if (!user.roles.some(roleId => roleIds.includes(roleId.toString()))) {
-      return [null, "El usuario no tiene uno de los roles necesarios para destacar a otro usuario"];
     }
 
     if (user.destacado === `${destacarUser.nombre} ${destacarUser.apellidos}`) {
@@ -374,7 +340,7 @@ async function destacarPerfilUser(userId, destacarUserId, roles) {
   }
 }
 
-async function quitarDestacadoPerfilUser(userId, destacarUserId, roles) {
+async function quitarDestacadoPerfilUser(userId, destacarUserId) {
   try {
     const user = await User.findById(userId);
     if (!user) {
@@ -384,14 +350,6 @@ async function quitarDestacadoPerfilUser(userId, destacarUserId, roles) {
     const destacarUser = await User.findById(destacarUserId);
     if (!destacarUser) {
       return [null, "El usuario a quitar el destacado no existe"];
-    }
-
-    // Verificar que el usuario que realiza la acción tiene uno de los roles adecuados
-    const rolesFound = await Role.find({ name: { $in: roles } });
-    if (rolesFound.length === 0) return [null, "No existen los roles proporcionados"];
-    const roleIds = rolesFound.map(role => role._id.toString());
-    if (!user.roles.some(roleId => roleIds.includes(roleId.toString()))) {
-      return [null, "El usuario no tiene uno de los roles necesarios para quitar el destacado"];
     }
 
     if (user.destacado !== `${destacarUser.nombre} ${destacarUser.apellidos}`) {

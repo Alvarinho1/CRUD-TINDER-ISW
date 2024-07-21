@@ -9,7 +9,7 @@ const router = Router();
 router.use(authenticationMiddleware);
 
 router.get("/buscarDisponibles", isAdmin, BusquedaController.BuscarDisponibles);
-router.post("/buscarPorCategoria", isAdmin, isAlumno, BusquedaController.BuscarPorCategoria);
+router.post("/buscarPorCategoria",isAlumno, BusquedaController.BuscarPorCategoria);
 
 router.get("/likes", isAdmin, isAlumno, BusquedaController.BuscarLikesUser);
 router.get("/dislikes", isAdmin, isAlumno, BusquedaController.BuscarDislikesUser);

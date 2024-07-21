@@ -20,8 +20,8 @@ router.delete("/:rut", isAdmin, userController.deleteUser);
 // Funciones adicionales
 router.post("/like", isAlumno, userController.likeUser);
 router.post("/dislike", isAlumno, userController.dislikeUser);
-router.delete("/alumno/like", isAlumno, userController.removeLikeUser);
-router.delete("/alumno/dislike", isAlumno, userController.removeDislikeUser);
+router.delete("/alumno/removelike", isAlumno, userController.removeLikeUser);
+router.delete("/alumno/removedislike", isAlumno, userController.removeDislikeUser);
 
 router.post("/alumno/destacarperfil", isAdmin, userController.destacarPerfilUser);
 router.delete("/alumno/quitardestacado", isAdmin, userController.quitarDestacadoPerfilUser);

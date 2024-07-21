@@ -15,7 +15,7 @@ async function getAlumnos() {
 
 async function createAlumno(alumno) {
   try {
-    const { nombre, apellidos, genero, rut, email, carrera, cursos, areasDeInteres, fotoPerfil, password, roles } = alumno;
+    const { nombre, apellidos, genero, rut, correo, carrera, cursos, areasDeInteres, fotoPerfil, password, roles } = alumno;
 
     const alumnoFound = await Alumno.findOne({ rut });
     if (alumnoFound) return [null, "El alumno ya existe"];
@@ -45,7 +45,7 @@ async function createAlumno(alumno) {
       apellidos,
       genero,
       rut,
-      email,
+      correo,
       carrera,
       cursos,
       areasDeInteres,
@@ -89,7 +89,7 @@ async function updateAlumno(rut, alumno) {
     const alumnoFound = await Alumno.findOne({ rut });
     if (!alumnoFound) return [null, "El alumno no existe"];
 
-    const { nombre, apellidos, genero, email, carrera, cursos, areasDeInteres, fotoPerfil, roles } = alumno;
+    const { nombre, apellidos, genero, correo, carrera, cursos, areasDeInteres, fotoPerfil, roles } = alumno;
 
     let roleIds = alumnoFound.roles; // Mantén los roles existentes
     if (roles) {
@@ -107,7 +107,7 @@ async function updateAlumno(rut, alumno) {
         nombre,
         apellidos,
         genero,
-        email,
+        correo,
         carrera,
         cursos,
         areasDeInteres,

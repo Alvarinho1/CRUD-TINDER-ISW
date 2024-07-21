@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 // Crea el esquema de la colección 'match'
 const matchSchema = new mongoose.Schema(
   {
-    UserId: {
+    userId: {  // Cambiado a minúsculas
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
