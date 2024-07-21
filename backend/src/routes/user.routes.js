@@ -1,27 +1,29 @@
 "use strict";
-// Importa el modulo 'express' para crear las rutas
+
 import { Router } from "express";
-
-/** Controlador de usuarios */
-import usuarioController from "../controllers/user.controller.js";
-
-/** Middlewares de autorización */
-import { isAdmin, isUser } from "../middlewares/authorization.middleware.js";
-
-/** Middleware de autenticación */
+import userController from "../controllers/user.controller.js";
+import { isAdmin, isAlumno } from "../middlewares/authorization.middleware.js";
 import authenticationMiddleware from "../middlewares/authentication.middleware.js";
+import upload from "../config/multerConfig.js"; // Si necesitas este middleware para subir fotos de perfil
 
-/** Instancia del enrutador */
 const router = Router();
 
-// Define el middleware de autenticación para todas las rutas
 router.use(authenticationMiddleware);
-// Define las rutas para los usuarios
-router.get("/", isAdmin, usuarioController.getUsers);
-router.post("/", isAdmin, usuarioController.createUser);
-router.get("/:id", isUser, usuarioController.getUserById);
-router.put("/:id", isAdmin, usuarioController.updateUser);
-router.delete("/:id", isAdmin, usuarioController.deleteUser);
 
-// Exporta el enrutador
+// Rutas básicas de usuario
+router.get("/", isAdmin, userController.getUsers);
+router.post("/", isAdmin, upload.single('fotoPerfil'), userController.createUser);
+router.get("/:rut", isAlumno, userController.getUserByRut);
+router.put("/:rut", isAlumno, userController.updateUser);
+router.delete("/:rut", isAdmin, userController.deleteUser);
+
+// Funciones adicionales
+router.post("/like", isAlumno, userController.likeUser);
+router.post("/dislike", isAlumno, userController.dislikeUser);
+router.delete("/alumno/like", isAlumno, userController.removeLikeUser);
+router.delete("/alumno/dislike", isAlumno, userController.removeDislikeUser);
+
+router.post("/alumno/destacarperfil", isAdmin, userController.destacarPerfilUser);
+router.delete("/alumno/quitardestacado", isAdmin, userController.quitarDestacadoPerfilUser);
+
 export default router;

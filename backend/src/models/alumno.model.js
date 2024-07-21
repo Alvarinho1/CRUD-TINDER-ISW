@@ -21,11 +21,11 @@ const alumnoSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  correo: {
+  email: {
     type: String,
     required: true,
     unique: true,
-    match: [/^\S+@\S+\.\S+$/, 'El correo no es válido']
+    match: [/^\S+@\S+\.\S+$/, 'El email no es válido']
   },
   carrera: {
     type: String,

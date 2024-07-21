@@ -27,10 +27,10 @@ async function getMatch(req, res) {
   }
 }
 
-async function getMatchesByAlumno(req, res) {
+async function getMatchesByUser(req, res) {
   try {
     const { params } = req;
-    const [matches, error] = await MatchService.getMatchesByAlumnoId(params.id);
+    const [matches, error] = await MatchService.getMatchesByUserId(params.id);
     if (error) return respondError(req, res, 404, error);
 
     matches.length === 0
@@ -44,5 +44,5 @@ async function getMatchesByAlumno(req, res) {
 export default {
   getMatches,
   getMatch,
-  getMatchesByAlumno,
+  getMatchesByUser,
 };

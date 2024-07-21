@@ -1,7 +1,7 @@
 import { respondSuccess, respondError } from "../utils/resHandler.js";
 import { handleError } from "../utils/errorHandler.js";
 import AlumnoService from "../services/alumno.service.js";
-import { alumnoSchema } from "../schema/alumno.schema.js";
+import { alumnoBodySchema } from "../schema/alumno.schema.js";
 import MatchService from "../services/match.service.js";
 
 async function getAlumnos(req, res) {
@@ -19,7 +19,7 @@ async function getAlumnos(req, res) {
 
 async function createAlumno(req, res) {
   try {
-    const { error: validationError } = alumnoSchema.validate(req.body);
+    const { error: validationError } = alumnoBodySchema.validate(req.body);
     if (validationError) return respondError(req, res, 400, validationError.details[0].message);
 
     const { body } = req;

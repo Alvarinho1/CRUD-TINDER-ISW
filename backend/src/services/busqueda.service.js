@@ -1,55 +1,50 @@
-import Alumno from "../models/alumno.model.js";
+"use strict";
+
+import User from "../models/user.model.js";
 import { handleError } from "../utils/errorHandler.js";
 
 async function BuscarDisponibles() {
     try {
-      
-        const todosLosAlumnos = await Alumno.find().lean();
+        const todosLosUsuarios = await User.find().lean();
 
-    
-        todosLosAlumnos.sort((a, b) => {
+        todosLosUsuarios.sort((a, b) => {
             const puntosA = calcularPuntos(a.likes);
             const puntosB = calcularPuntos(b.likes);
             return puntosB - puntosA;
         });
 
-       
         function calcularPuntos(likes) {
             return (likes ? likes.length : 0) * 50;
         }
 
-      
-        const alumnosPorPuntos = {};
-        todosLosAlumnos.forEach(alumno => {
-            const puntos = calcularPuntos(alumno.likes);
-            if (!alumnosPorPuntos[puntos]) {
-                alumnosPorPuntos[puntos] = [];
+        const usuariosPorPuntos = {};
+        todosLosUsuarios.forEach(user => {
+            const puntos = calcularPuntos(user.likes);
+            if (!usuariosPorPuntos[puntos]) {
+                usuariosPorPuntos[puntos] = [];
             }
-            alumnosPorPuntos[puntos].push(alumno);
+            usuariosPorPuntos[puntos].push(user);
         });
 
-        
-        Object.keys(alumnosPorPuntos).forEach(puntos => {
-            shuffleArray(alumnosPorPuntos[puntos]);
+        Object.keys(usuariosPorPuntos).forEach(puntos => {
+            shuffleArray(usuariosPorPuntos[puntos]);
         });
 
-     
         let disponibles = [];
-        Object.keys(alumnosPorPuntos).sort((a, b) => b - a).forEach(puntos => {
-            disponibles = [...disponibles, ...alumnosPorPuntos[puntos]];
+        Object.keys(usuariosPorPuntos).sort((a, b) => b - a).forEach(puntos => {
+            disponibles = [...disponibles, ...usuariosPorPuntos[puntos]];
         });
 
         if (!disponibles || disponibles.length === 0) {
             return [null, "No hay resultados"];
         }
-        
+
         return [disponibles, null];
     } catch (error) {
         handleError(error, "busqueda.service -> BuscarDisponibles");
         return [null, "No hay resultados"];
     }
 }
-
 
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -59,9 +54,6 @@ function shuffleArray(array) {
     return array;
 }
 
-
-
-
 async function BuscarPorCategoria(carrera, genero, cursos, areasDeInteres) {
     try {
         const query = {};
@@ -70,7 +62,7 @@ async function BuscarPorCategoria(carrera, genero, cursos, areasDeInteres) {
         if (cursos) query.cursos = { $all: cursos };
         if (areasDeInteres) query.areasDeInteres = { $all: areasDeInteres };
 
-        const resultados = await Alumno.find(query);
+        const resultados = await User.find(query);
         if (!resultados || resultados.length === 0) return [null, "No se encontraron resultados"];
         return [resultados, null];
     } catch (error) {
@@ -79,136 +71,108 @@ async function BuscarPorCategoria(carrera, genero, cursos, areasDeInteres) {
     }
 }
 
-async function BuscarLikesAlumno() {
+async function BuscarLikesUsuario() {
     try {
-        const alumnos = await Alumno.find(
-            { "likes.alumnoId": { $exists: true, $ne: [] } },
+        const usuarios = await User.find(
+            { "likes.usuarioId": { $exists: true, $ne: [] } },
             { nombre: 1, apellidos: 1, rut: 1, likes: 1 }
         );
 
-        if (!alumnos || alumnos.length === 0) {
-            return [null, "No hay ningún alumno con likes"];
+        if (!usuarios || usuarios.length === 0) {
+            return [null, "No hay ningún usuario con likes"];
         }
 
-     
-        const populatedAlumnos = await Alumno.populate(alumnos, { path: "likes.alumnoId", select: "id nombre apellidos" });
+        const populatedUsuarios = await User.populate(usuarios, { path: "likes.usuarioId", select: "id nombre apellidos" });
 
- 
-        return [populatedAlumnos, null];
+        return [populatedUsuarios, null];
     } catch (error) {
-        handleError(error, "busqueda.service -> BuscarLikesAlumno");
+        handleError(error, "busqueda.service -> BuscarLikesUsuario");
         return [null, error.message];
     }
 }
 
-
-async function BuscarDislikesAlumno() {
+async function BuscarDislikesUsuario() {
     try {
-        const alumnos = await Alumno.find(
+        const usuarios = await User.find(
             { dislikes: { $exists: true, $ne: [] } },
             { nombre: 1, apellidos: 1, rut: 1, dislikes: 1 }
         );
 
-        if (!alumnos || alumnos.length === 0) {
-            return [null, "No hay ningún alumno con dislikes"];
+        if (!usuarios || usuarios.length === 0) {
+            return [null, "No hay ningún usuario con dislikes"];
         }
 
+        const populatedUsuarios = await User.populate(usuarios, { path: "dislikes.usuarioId", select: "id nombre apellidos" });
 
-        const populatedAlumnos = await Alumno.populate(alumnos, { path: "dislikes.alumnoId", select: "id nombre apellidos" });
-
-
-        return [populatedAlumnos, null];
+        return [populatedUsuarios, null];
     } catch (error) {
-        handleError(error, "busqueda.service -> BuscarDislikesAlumno");
+        handleError(error, "busqueda.service -> BuscarDislikesUsuario");
         return [null, error.message];
     }
 }
 
-
-async function BuscarLikesAlumnorut(rut) {
+async function BuscarLikesUsuarioRut(rut) {
     try {
-        const alumno = await Alumno.findOne({ rut }, { nombre: 1, apellidos: 1, rut: 1, likes: 1 });
-        if (!alumno) return [null, "El alumno no existe"];
+        const usuario = await User.findOne({ rut }, { nombre: 1, apellidos: 1, rut: 1, likes: 1 });
+        if (!usuario) return [null, "El usuario no existe"];
 
-        if (!alumno.likes || alumno.likes.length === 0) {
-            return [null, "El alumno no tiene likes"];
+        if (!usuario.likes || usuario.likes.length === 0) {
+            return [null, "El usuario no tiene likes"];
         }
 
-      
-        const populatedAlumno = await Alumno.populate(alumno, { path: "likes.alumnoId", select: "id nombre apellidos" });
+        const populatedUsuario = await User.populate(usuario, { path: "likes.usuarioId", select: "id nombre apellidos" });
 
-      
-        return [populatedAlumno, null];
+        return [populatedUsuario, null];
     } catch (error) {
-        handleError(error, "busqueda.service -> BuscarLikesAlumnorut");
+        handleError(error, "busqueda.service -> BuscarLikesUsuarioRut");
         return [null, error.message];
     }
 }
 
-
-async function BuscarDislikesAlumnorut(rut) {
+async function BuscarDislikesUsuarioRut(rut) {
     try {
-        const alumno = await Alumno.findOne({ rut }, { nombre: 1, apellidos: 1, rut: 1, dislikes: 1 });
-        if (!alumno) return [null, "El alumno no existe"];
+        const usuario = await User.findOne({ rut }, { nombre: 1, apellidos: 1, rut: 1, dislikes: 1 });
+        if (!usuario) return [null, "El usuario no existe"];
 
-        if (!alumno.dislikes || alumno.dislikes.length === 0) {
-            return [null, "El alumno no tiene dislikes"];
+        if (!usuario.dislikes || usuario.dislikes.length === 0) {
+            return [null, "El usuario no tiene dislikes"];
         }
 
-       
-        const populatedAlumno = await Alumno.populate(alumno, { path: "dislikes.alumnoId", select: "id nombre apellidos" });
+        const populatedUsuario = await User.populate(usuario, { path: "dislikes.usuarioId", select: "id nombre apellidos" });
 
-       
-        return [populatedAlumno, null];
+        return [populatedUsuario, null];
     } catch (error) {
-        handleError(error, "busqueda.service -> BuscarDislikesAlumnorut");
+        handleError(error, "busqueda.service -> BuscarDislikesUsuarioRut");
         return [null, error.message];
     }
 }
 
-
-async function RankingAlumnos() {
+async function RankingUsuarios() {
     try {
-        const rankingAlumnosLikes = await Alumno.aggregate([
-           
-            { $addFields: { 
-                likes: { $ifNull: ["$likes", []] }
-            } },
-            
-            { 
-                $project: { 
-                    nombre: 1, 
-                    apellidos: 1, 
-                    rut: 1, 
-                    likeCount: { $size: "$likes" }, 
-                    points: { $multiply: [{ $size: "$likes" }, 50] }
-                } 
-            },
-          
+        const rankingUsuariosLikes = await User.aggregate([
+            { $addFields: { likes: { $ifNull: ["$likes", []] } } },
+            { $project: { nombre: 1, apellidos: 1, rut: 1, likeCount: { $size: "$likes" }, points: { $multiply: [{ $size: "$likes" }, 50] } } },
             { $sort: { points: -1 } },
-          
             { $limit: 10 }
         ]);
 
-        if (!rankingAlumnosLikes || rankingAlumnosLikes.length === 0) {
-            return [null, "No se encontraron alumnos con likes"];
+        if (!rankingUsuariosLikes || rankingUsuariosLikes.length === 0) {
+            return [null, "No se encontraron usuarios con likes"];
         }
 
-        return [rankingAlumnosLikes, null];
+        return [rankingUsuariosLikes, null];
     } catch (error) {
-        handleError(error, "busqueda.service -> RankingAlumnosLikes");
+        handleError(error, "busqueda.service -> RankingUsuariosLikes");
         return [null, error.message];
     }
 }
-
-
 
 export default {
     BuscarDisponibles,
     BuscarPorCategoria,
-    BuscarLikesAlumno,
-    BuscarDislikesAlumno,
-    BuscarLikesAlumnorut,
-    BuscarDislikesAlumnorut,
-    RankingAlumnos
+    BuscarLikesUsuario,
+    BuscarDislikesUsuario,
+    BuscarLikesUsuarioRut,
+    BuscarDislikesUsuarioRut,
+    RankingUsuarios
 };

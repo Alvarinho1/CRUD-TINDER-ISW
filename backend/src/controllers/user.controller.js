@@ -1,132 +1,213 @@
 "use strict";
 
 import { respondSuccess, respondError } from "../utils/resHandler.js";
-import UserService from "../services/user.service.js";
-import { userBodySchema, userIdSchema } from "../schema/user.schema.js";
 import { handleError } from "../utils/errorHandler.js";
+import UserService from "../services/user.service.js";
+import { userSchema } from "../schema/user.schema.js"; // Asume que existe un esquema para usuarios
+import MatchService from "../services/match.service.js";
 
-/**
- * Obtiene todos los usuarios
- * @param {Object} req - Objeto de petición
- * @param {Object} res - Objeto de respuesta
- */
+// Obtener todos los usuarios
 async function getUsers(req, res) {
   try {
-    const [usuarios, errorUsuarios] = await UserService.getUsers();
-    if (errorUsuarios) return respondError(req, res, 404, errorUsuarios);
+    const [users, error] = await UserService.getUsers();
+    if (error) return respondError(req, res, 404, error);
 
-    usuarios.length === 0
+    users.length === 0
       ? respondSuccess(req, res, 204)
-      : respondSuccess(req, res, 200, usuarios);
+      : respondSuccess(req, res, 200, users);
   } catch (error) {
-    handleError(error, "user.controller -> getUsers");
-    respondError(req, res, 400, error.message);
+    respondError(req, res, 500, "Error interno del servidor");
   }
 }
 
-/**
- * Crea un nuevo usuario
- * @param {Object} req - Objeto de petición
- * @param {Object} res - Objeto de respuesta
- */
+// Crear un nuevo usuario
 async function createUser(req, res) {
   try {
+    const { error: validationError } = userSchema.validate(req.body);
+    if (validationError) return respondError(req, res, 400, validationError.details[0].message);
+
     const { body } = req;
-    const { error: bodyError } = userBodySchema.validate(body);
-    if (bodyError) return respondError(req, res, 400, bodyError.message);
+    const file = req.file;
 
-    const [newUser, userError] = await UserService.createUser(body);
-
-    if (userError) return respondError(req, res, 400, userError);
-    if (!newUser) {
-      return respondError(req, res, 400, "No se creo el usuario");
+    if (file) {
+      body.fotoPerfil = file.path;
     }
+
+    const [newUser, error] = await UserService.createUser(body);
+
+    if (error) return respondError(req, res, 400, error);
 
     respondSuccess(req, res, 201, newUser);
   } catch (error) {
-    handleError(error, "user.controller -> createUser");
-    respondError(req, res, 500, "No se creo el usuario");
+    // Manejo de errores específicos de multer
+    if (error instanceof multer.MulterError) {
+      return respondError(req, res, 400, error.message);
+    } else if (error.message === 'Solo se permiten archivos .png y .jpg') {
+      return respondError(req, res, 400, error.message);
+    }
+
+    respondError(req, res, 500, "Error interno del servidor");
   }
 }
 
-/**
- * Obtiene un usuario por su id
- * @param {Object} req - Objeto de petición
- * @param {Object} res - Objeto de respuesta
- */
-async function getUserById(req, res) {
+// Obtener un usuario por RUT
+async function getUserByRut(req, res) {
   try {
     const { params } = req;
-    const { error: paramsError } = userIdSchema.validate(params);
-    if (paramsError) return respondError(req, res, 400, paramsError.message);
+    const [user, error] = await UserService.getUserByRut(params.rut);
 
-    const [user, errorUser] = await UserService.getUserById(params.id);
-
-    if (errorUser) return respondError(req, res, 404, errorUser);
+    if (error) return respondError(req, res, 404, error);
 
     respondSuccess(req, res, 200, user);
   } catch (error) {
-    handleError(error, "user.controller -> getUserById");
-    respondError(req, res, 500, "No se pudo obtener el usuario");
+    respondError(req, res, 500, "Error interno del servidor");
   }
 }
 
-/**
- * Actualiza un usuario por su id
- * @param {Object} req - Objeto de petición
- * @param {Object} res - Objeto de respuesta
- */
+// Actualizar un usuario por RUT
 async function updateUser(req, res) {
   try {
+    const { error: validationError } = userSchema.validate(req.body);
+    if (validationError) return respondError(req, res, 400, validationError.details[0].message);
+
     const { params, body } = req;
-    const { error: paramsError } = userIdSchema.validate(params);
-    if (paramsError) return respondError(req, res, 400, paramsError.message);
+    const [updatedUser, error] = await UserService.updateUser(params.rut, body);
 
-    const { error: bodyError } = userBodySchema.validate(body);
-    if (bodyError) return respondError(req, res, 400, bodyError.message);
+    if (error) return respondError(req, res, 400, error);
 
-    const [user, userError] = await UserService.updateUser(params.id, body);
-
-    if (userError) return respondError(req, res, 400, userError);
-
-    respondSuccess(req, res, 200, user);
+    respondSuccess(req, res, 200, updatedUser);
   } catch (error) {
-    handleError(error, "user.controller -> updateUser");
-    respondError(req, res, 500, "No se pudo actualizar el usuario");
+    respondError(req, res, 500, "Error interno del servidor");
   }
 }
 
-/**
- * Elimina un usuario por su id
- * @param {Object} req - Objeto de petición
- * @param {Object} res - Objeto de respuesta
- */
+// Eliminar un usuario por RUT
 async function deleteUser(req, res) {
   try {
     const { params } = req;
-    const { error: paramsError } = userIdSchema.validate(params);
-    if (paramsError) return respondError(req, res, 400, paramsError.message);
+    const [deletedUser, error] = await UserService.deleteUser(params.rut);
 
-    const user = await UserService.deleteUser(params.id);
-    !user
-      ? respondError(
-          req,
-          res,
-          404,
-          "No se encontro el usuario solicitado",
-          "Verifique el id ingresado",
-        )
-      : respondSuccess(req, res, 200, user);
+    if (error) return respondError(req, res, 404, error);
+
+    respondSuccess(req, res, 200, deletedUser);
   } catch (error) {
-    handleError(error, "user.controller -> deleteUser");
-    respondError(req, res, 500, "No se pudo eliminar el usuario");
+    respondError(req, res, 500, "Error interno del servidor");
+  }
+}
+
+// Dar un "like" a un usuario
+async function likeUser(req, res) {
+  try {
+    const { userId, likedUserId } = req.body;
+    const [userLiked, error] = await UserService.likeUser(userId, likedUserId);
+
+    const [user, errorUser] = await UserService.getUserByRut(userId);
+
+    // Si userId tiene un like de likedUserId es un match, y guardas en match
+    console.log("Buscar match", likedUserId, user.likes);
+    if (user && user.likes.find(like => like.userId === likedUserId)) {
+      console.log("Es un match", likedUserId, user.likes);
+      const [match, errorMatch] = await MatchService.createMatch(userId, likedUserId);
+    }
+
+    if (error) return respondError(req, res, 400, error);
+
+    respondSuccess(req, res, 200, userLiked);
+  } catch (error) {
+    handleError(error, "user.controller -> likeUser");
+    respondError(req, res, 500, "Error interno del servidor");
+  }
+}
+
+// Dar un "dislike" a un usuario
+async function dislikeUser(req, res) {
+  try {
+    const { userId, dislikedUserId } = req.body;
+    const [user, error] = await UserService.dislikeUser(userId, dislikedUserId);
+
+    if (error) return respondError(req, res, 400, error);
+
+    respondSuccess(req, res, 200, user);
+  } catch (error) {
+    handleError(error, "user.controller -> dislikeUser");
+    respondError(req, res, 500, "Error interno del servidor");
+  }
+}
+
+// Eliminar un "like" de un usuario
+async function removeLikeUser(req, res) {
+  try {
+    const { userId, likedUserId } = req.body;
+    const [user, error] = await UserService.removeLikeUser(userId, likedUserId);
+
+    if (error) return respondError(req, res, 400, error);
+
+    respondSuccess(req, res, 200, user);
+  } catch (error) {
+    handleError(error, "user.controller -> removeLikeUser");
+    respondError(req, res, 500, "Error interno del servidor");
+  }
+}
+
+// Eliminar un "dislike" de un usuario
+async function removeDislikeUser(req, res) {
+  try {
+    const { userId, dislikedUserId } = req.body;
+    const [user, error] = await UserService.removeDislikeUser(userId, dislikedUserId);
+
+    if (error) return respondError(req, res, 400, error);
+
+    respondSuccess(req, res, 200, user);
+  } catch (error) {
+    handleError(error, "user.controller -> removeDislikeUser");
+    respondError(req, res, 500, "Error interno del servidor");
+  }
+}
+
+// Destacar perfil de un usuario
+async function destacarPerfilUser(req, res) {
+  try {
+    const { userId, destacarUserId } = req.body;
+    const [user, message] = await UserService.destacarPerfilUser(userId, destacarUserId);
+
+    if (!user) {
+      return respondError(req, res, 400, message);
+    }
+
+    respondSuccess(req, res, 200, { user, message });
+  } catch (error) {
+    console.error(error);
+    respondError(req, res, 500, "Error interno del servidor");
+  }
+}
+
+// Quitar destacado de perfil de un usuario
+async function quitarDestacadoPerfilUser(req, res) {
+  try {
+    const { userId, destacarUserId } = req.body; // Cambiado a destacarUserId
+    const [user, message] = await UserService.quitarDestacadoPerfilUser(userId, destacarUserId); // Cambiado a destacarUserId
+
+    if (!user) {
+      return respondError(req, res, 400, message);
+    }
+
+    respondSuccess(req, res, 200, { user, message });
+  } catch (error) {
+    console.error(error);
+    respondError(req, res, 500, "Error interno del servidor");
   }
 }
 
 export default {
   getUsers,
   createUser,
-  getUserById,
+  getUserByRut,
   updateUser,
   deleteUser,
+  likeUser,
+  dislikeUser,
+  removeLikeUser,
+  removeDislikeUser,
+  destacarPerfilUser,
+  quitarDestacadoPerfilUser,
 };

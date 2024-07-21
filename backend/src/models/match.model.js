@@ -3,14 +3,14 @@ import mongoose from "mongoose";
 // Crea el esquema de la colección 'match'
 const matchSchema = new mongoose.Schema(
   {
-    alumnoId: {
+    UserId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Alumno",
+      ref: "User",
       required: true,
     },
-    matchAlumnoId: {
+    matchUserId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Alumno",
+      ref: "User",
       required: true,
     },
   },

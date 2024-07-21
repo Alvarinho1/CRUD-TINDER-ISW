@@ -2,7 +2,7 @@
 
 import { Router } from "express";
 import alumnoController from "../controllers/alumno.controller.js";
-import { isAdmin, isUser } from "../middlewares/authorization.middleware.js";
+import { isAdmin, isAlumno } from "../middlewares/authorization.middleware.js";
 import authenticationMiddleware from "../middlewares/authentication.middleware.js";
 import upload from "../config/multerConfig.js";
 
@@ -12,16 +12,16 @@ router.use(authenticationMiddleware);
 
 router.get("/", isAdmin, alumnoController.getAlumnos);
 router.post("/", isAdmin, upload.single('fotoPerfil'), alumnoController.createAlumno);
-router.get("/:rut", isUser, alumnoController.getAlumnoByRut);
-router.put("/:rut", isUser, alumnoController.updateAlumno);
+router.get("/:rut", isAlumno, alumnoController.getAlumnoByRut);
+router.put("/:rut", isAlumno, alumnoController.updateAlumno);
 router.delete("/:rut", isAdmin, alumnoController.deleteAlumno);
 
-router.post("/like", isUser, alumnoController.likeAlumno);
-router.post("/dislike", isUser, alumnoController.dislikeAlumno);
-router.delete("/alumno/like", isUser, alumnoController.removeLikeAlumno);
-router.delete("/alumno/dislike", isUser, alumnoController.removeDislikeAlumno);
+router.post("/like", isAlumno, alumnoController.likeAlumno);
+router.post("/dislike", isAlumno, alumnoController.dislikeAlumno);
+router.delete("/alumno/like", isAlumno, alumnoController.removeLikeAlumno);
+router.delete("/alumno/dislike", isAlumno, alumnoController.removeDislikeAlumno);
 
-router.post("/alumno/destacarperfil", isUser, alumnoController.destacarPerfilAlumno);
-router.delete("/alumno/quitardestacado", isUser, alumnoController.quitarDestacadoPerfilAlumno);
+router.post("/alumno/destacarperfil", isAlumno, alumnoController.destacarPerfilAlumno);
+router.delete("/alumno/quitardestacado", isAlumno, alumnoController.quitarDestacadoPerfilAlumno);
 
 export default router;

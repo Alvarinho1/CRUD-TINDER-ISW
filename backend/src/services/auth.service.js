@@ -105,24 +105,18 @@ async function refresh(cookies) {
   }
 }
 
-/**
- * Registra un nuevo usuario.
- * @async
- * @function register
- * @param {Object} user - Objeto de usuario
- * @returns {Object} Resultado del registro
- */
 async function register(user) {
   try {
-    const { username, email, password, rut, roles } = user;
+    const { nombre, apellidos, genero, rut, email, carrera, cursos, areasDeInteres, fotoPerfil, password, roles } = user;
+
+    // Verifica que los campos obligatorios no estén vacíos
+    if (!email || !password || !rut) {
+      return { error: "email, RUT y contraseña son campos obligatorios" };
+    }
 
     // Verifica si el email ya está en uso
     const existingUserByEmail = await User.findOne({ email });
     if (existingUserByEmail) return { error: "El email ya está en uso" };
-
-    // Verifica si el nombre de usuario ya está en uso
-    const existingUserByUsername = await User.findOne({ username });
-    if (existingUserByUsername) return { error: "El nombre de usuario ya está en uso" };
 
     // Verifica si el RUT ya está en uso
     const existingUserByRUT = await User.findOne({ rut });
@@ -149,15 +143,21 @@ async function register(user) {
 
     // Crea un nuevo usuario con los IDs de roles
     const newUser = new User({
-      username,
-      email,
-      password: await User.encryptPassword(password),
+      nombre,
+      apellidos,
+      genero,
       rut,
+      email,
+      carrera,
+      cursos,
+      areasDeInteres,
+      fotoPerfil,
+      password: await User.encryptPassword(password),
       roles: roleIds
     });
-    const savedUser = await newUser.save(); // Guarda el usuario en la base de datos
 
-    console.log("Usuario guardado:", savedUser); // Muestra el usuario guardado en la consola
+    // Guarda el usuario en la base de datos
+    const savedUser = await newUser.save();
 
     // Genera el token de acceso
     const accessToken = jwt.sign(
@@ -169,32 +169,15 @@ async function register(user) {
     return { error: null, accessToken };
 
   } catch (error) {
+    // Maneja los errores y devuelve un mensaje apropiado
+    if (error.code === 11000) {
+      return { error: "El email electrónico o RUT ya están en uso." };
+    }
     handleError(error, "auth.service -> register");
     return { error: error.message };
   }
 }
-/**
- * Obtiene el perfil del usuario.
- * @async
- * @function getProfile
- * @param {String} userId - ID del usuario
- */
-async function getProfile(userId) {
-  try {
-    const user = await User.findById(userId).populate("roles").exec();
-    if (!user) return null;
-
-    return {
-      username: user.username,
-      email: user.email,
-      roles: user.roles,
-      rut: user.rut,
-    };
-  } catch (error) {
-    handleError(error, "auth.service -> getProfile");
-    return null;
-  }
-}
 
 
-export default { login, refresh, register, getProfile };
+
+export default { login, refresh, register };

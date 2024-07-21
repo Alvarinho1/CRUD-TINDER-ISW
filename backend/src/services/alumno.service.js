@@ -1,9 +1,10 @@
 import Alumno from "../models/alumno.model.js";
+import Role from "../models/role.model.js";
 import { handleError } from "../utils/errorHandler.js";
 
 async function getAlumnos() {
   try {
-    const alumnos = await Alumno.find().exec();
+    const alumnos = await Alumno.find().populate("roles").exec(); // Incluye roles en la consulta
     if (!alumnos) return [null, "No hay alumnos"];
     return [alumnos, null];
   } catch (error) {
@@ -14,24 +15,43 @@ async function getAlumnos() {
 
 async function createAlumno(alumno) {
   try {
-    const { nombre, apellidos, genero, rut, correo, carrera, cursos, areasDeInteres, fotoPerfil, password } = alumno;
+    const { nombre, apellidos, genero, rut, email, carrera, cursos, areasDeInteres, fotoPerfil, password, roles } = alumno;
 
     const alumnoFound = await Alumno.findOne({ rut });
     if (alumnoFound) return [null, "El alumno ya existe"];
 
     const encryptedPassword = await Alumno.encryptPassword(password);
 
+    let roleIds = [];
+    if (roles && roles.length > 0) {
+      // Verifica si los roles proporcionados existen en la base de datos
+      const foundRoles = await Role.find({ name: { $in: roles } });
+      if (foundRoles.length !== roles.length) {
+        return [null, "Uno o más roles no existen en la base de datos"];
+      }
+      roleIds = foundRoles.map(role => role._id); // Extrae los IDs de los roles encontrados
+    } else {
+      // Asigna el rol por defecto "alumno" si no se proporcionan roles
+      const defaultRole = await Role.findOne({ name: "alumno" });
+      if (defaultRole) {
+        roleIds = [defaultRole._id];
+      } else {
+        return [null, "El rol 'alumno' no existe en la base de datos"];
+      }
+    }
+
     const newAlumno = new Alumno({
       nombre,
       apellidos,
       genero,
       rut,
-      correo,
+      email,
       carrera,
       cursos,
       areasDeInteres,
-      fotoPerfil, 
-      password: encryptedPassword 
+      fotoPerfil,
+      password: encryptedPassword,
+      roles: roleIds // Asigna los roles
     });
     await newAlumno.save();
 
@@ -44,7 +64,7 @@ async function createAlumno(alumno) {
 
 async function getAlumnoByRut(rut) {
   try {
-    const alumno = await Alumno.findOne({ rut }).exec();
+    const alumno = await Alumno.findOne({ rut }).populate("roles").exec();
     if (!alumno) return [null, "El alumno no existe"];
     return [alumno, null];
   } catch (error) {
@@ -55,7 +75,7 @@ async function getAlumnoByRut(rut) {
 
 async function getAlumnoById(id) {
   try {
-    const alumno = await Alumno.findById(id).exec();
+    const alumno = await Alumno.findById(id).populate("roles").exec();
     if (!alumno) return [null, "El alumno no existe"];
     return [alumno, null];
   } catch (error) {
@@ -69,7 +89,17 @@ async function updateAlumno(rut, alumno) {
     const alumnoFound = await Alumno.findOne({ rut });
     if (!alumnoFound) return [null, "El alumno no existe"];
 
-    const { nombre, apellidos, genero, correo, carrera, cursos, areasDeInteres } = alumno;
+    const { nombre, apellidos, genero, email, carrera, cursos, areasDeInteres, fotoPerfil, roles } = alumno;
+
+    let roleIds = alumnoFound.roles; // Mantén los roles existentes
+    if (roles) {
+      // Verifica si los roles proporcionados existen en la base de datos
+      const foundRoles = await Role.find({ name: { $in: roles } });
+      if (foundRoles.length !== roles.length) {
+        return [null, "Uno o más roles no existen en la base de datos"];
+      }
+      roleIds = foundRoles.map(role => role._id); // Actualiza con los IDs de los roles encontrados
+    }
 
     const alumnoUpdated = await Alumno.findOneAndUpdate(
       { rut },
@@ -77,14 +107,15 @@ async function updateAlumno(rut, alumno) {
         nombre,
         apellidos,
         genero,
-        correo,
+        email,
         carrera,
         cursos,
         areasDeInteres,
-        fotoPerfil
+        fotoPerfil,
+        roles: roleIds // Actualiza los roles
       },
       { new: true },
-    );
+    ).populate("roles");
 
     return [alumnoUpdated, null];
   } catch (error) {
@@ -106,53 +137,51 @@ async function deleteAlumno(rut) {
 
 async function likeAlumno(alumnoId, likedAlumnoId) {
   try {
-      if (alumnoId === likedAlumnoId) {
-          return [null, "No puedes darte like a ti mismo"];
-      }
+    if (alumnoId === likedAlumnoId) {
+      return [null, "No puedes darte like a ti mismo"];
+    }
 
-      const alumno = await Alumno.findById(alumnoId);
-      if (!alumno) {
-          const errorMessage = "El alumno que da el like no existe";
-          handleError(new Error(errorMessage), "likeAlumno - Alumno no encontrado");
-          return [null, errorMessage];
-      }
+    const alumno = await Alumno.findById(alumnoId).exec();
+    if (!alumno) {
+      const errorMessage = "El alumno que da el like no existe";
+      handleError(new Error(errorMessage), "likeAlumno - Alumno no encontrado");
+      return [null, errorMessage];
+    }
 
-      const likedAlumno = await Alumno.findById(likedAlumnoId);
-      if (!likedAlumno) {
-          const errorMessage = "El alumno que recibe el like no existe";
-          handleError(new Error(errorMessage), "likeAlumno - Liked alumno no encontrado");
-          return [null, errorMessage];
-      }
+    const likedAlumno = await Alumno.findById(likedAlumnoId).exec();
+    if (!likedAlumno) {
+      const errorMessage = "El alumno que recibe el like no existe";
+      handleError(new Error(errorMessage), "likeAlumno - Liked alumno no encontrado");
+      return [null, errorMessage];
+    }
 
-      // Verificar si likedAlumno.likes existe y es un array
-      if (!likedAlumno.likes || !Array.isArray(likedAlumno.likes)) {
-          likedAlumno.likes = [];
-      }
+    if (!likedAlumno.likes || !Array.isArray(likedAlumno.likes)) {
+      likedAlumno.likes = [];
+    }
 
-      // Verificar si el likedAlumno ya ha recibido like del alumno
-      const likesIds = likedAlumno.likes.map(like => like.alumnoId?.toString());
-      if (likesIds.includes(alumnoId)) {
-          const errorMessage = "El alumno ya ha recibido like de esta persona";
-          handleError(new Error(errorMessage), "likeAlumno - Like duplicado");
-          return [null, errorMessage];
-      }
+    const likesIds = likedAlumno.likes.map(like => like.alumnoId?.toString());
+    if (likesIds.includes(alumnoId)) {
+      const errorMessage = "El alumno ya ha recibido like de esta persona";
+      handleError(new Error(errorMessage), "likeAlumno - Like duplicado");
+      return [null, errorMessage];
+    }
 
-      // Agregar el like al likedAlumno
-      likedAlumno.likes.push({
-          alumnoId: alumnoId,
-          nombreCompleto: `${alumno.nombre} ${alumno.apellidos}`,
-      });
+    likedAlumno.likes.push({
+      alumnoId: alumnoId,
+      nombreCompleto: `${alumno.nombre} ${alumno.apellidos}`,
+      role: alumno.role  // Agregar role
+    });
 
-      await likedAlumno.save();
+    await likedAlumno.save();
 
-      return [likedAlumno, null];
+    return [likedAlumno, null];
   } catch (error) {
-      if (error.name === 'CastError') {
-          handleError(error, 'likeAlumno - El ID no es válido, ingrese un ID válido');
-          return [null, 'El ID no es válido, ingrese un ID válido'];
-      }
-      handleError(error, "likeAlumno - Error interno del servidor");
-      return [null, "Error interno del servidor"];
+    if (error.name === 'CastError') {
+      handleError(error, 'likeAlumno - El ID no es válido, ingrese un ID válido');
+      return [null, 'El ID no es válido, ingrese un ID válido'];
+    }
+    handleError(error, "likeAlumno - Error interno del servidor");
+    return [null, "Error interno del servidor"];
   }
 }
 
@@ -162,26 +191,24 @@ async function dislikeAlumno(alumnoId, dislikedAlumnoId) {
       return [null, "No puedes darte dislike a ti mismo"];
     }
 
-    const alumno = await Alumno.findById(alumnoId);
+    const alumno = await Alumno.findById(alumnoId).exec();
     if (!alumno) {
       const errorMessage = "El alumno que da el dislike no existe";
       handleError(new Error(errorMessage), "dislikeAlumno - Alumno no encontrado");
       return [null, errorMessage];
     }
 
-    const dislikedAlumno = await Alumno.findById(dislikedAlumnoId);
+    const dislikedAlumno = await Alumno.findById(dislikedAlumnoId).exec();
     if (!dislikedAlumno) {
       const errorMessage = "El alumno que recibe el dislike no existe";
       handleError(new Error(errorMessage), "dislikeAlumno - Disliked alumno no encontrado");
       return [null, errorMessage];
     }
 
-    // Verificar si dislikedAlumno.dislikes existe y es un array
     if (!dislikedAlumno.dislikes || !Array.isArray(dislikedAlumno.dislikes)) {
       dislikedAlumno.dislikes = [];
     }
 
-    // Verificar si el dislikedAlumno ya ha dado dislike al alumno
     const dislikedAlumnosIds = dislikedAlumno.dislikes.map(dislike => dislike.alumnoId.toString());
     if (dislikedAlumnosIds.includes(alumnoId)) {
       const errorMessage = "El alumno ya ha dado dislike a esta persona";
@@ -189,10 +216,10 @@ async function dislikeAlumno(alumnoId, dislikedAlumnoId) {
       return [null, errorMessage];
     }
 
-    // Agregar el dislike al dislikedAlumno
     dislikedAlumno.dislikes.push({
       alumnoId: alumnoId,
       nombreCompleto: `${alumno.nombre} ${alumno.apellidos}`,
+      role: alumno.role  // Agregar role
     });
 
     await dislikedAlumno.save();
@@ -210,28 +237,25 @@ async function dislikeAlumno(alumnoId, dislikedAlumnoId) {
 
 async function removeLikeAlumno(alumnoId, likedAlumnoId) {
   try {
-    const alumno = await Alumno.findById(alumnoId);
+    const alumno = await Alumno.findById(alumnoId).exec();
     if (!alumno) {
       return [null, "El alumno que recibe el like no existe"];
     }
 
-    const likedAlumno = await Alumno.findById(likedAlumnoId);
+    const likedAlumno = await Alumno.findById(likedAlumnoId).exec();
     if (!likedAlumno) {
       return [null, "El alumno que da el like no existe"];
     }
 
-    // Verificar si likedAlumno.likes existe y es un array
     if (!likedAlumno.likes || !Array.isArray(likedAlumno.likes)) {
       return [null, "El alumno no ha dado like a nadie"];
     }
 
-    // Buscar el índice del like del alumno en likedAlumno.likes
     const index = likedAlumno.likes.findIndex(like => like.alumnoId.toString() === alumnoId);
     if (index === -1) {
       return [null, "El alumno no ha dado like a este alumno"];
     }
 
-    // Eliminar el like del array de likes
     likedAlumno.likes.splice(index, 1);
     await likedAlumno.save();
 
@@ -248,28 +272,25 @@ async function removeLikeAlumno(alumnoId, likedAlumnoId) {
 
 async function removeDislikeAlumno(alumnoId, dislikedAlumnoId) {
   try {
-    const alumno = await Alumno.findById(alumnoId);
+    const alumno = await Alumno.findById(alumnoId).exec();
     if (!alumno) {
       return [null, "El alumno que recibe el dislike no existe"];
     }
 
-    const dislikedAlumno = await Alumno.findById(dislikedAlumnoId);
+    const dislikedAlumno = await Alumno.findById(dislikedAlumnoId).exec();
     if (!dislikedAlumno) {
       return [null, "El alumno que quita el dislike no existe"];
     }
 
-    // Verificar si dislikedAlumno.dislikes existe y es un array
     if (!dislikedAlumno.dislikes || !Array.isArray(dislikedAlumno.dislikes)) {
       return [null, "El alumno no ha dado dislike a nadie"];
     }
 
-    // Buscar el índice del dislike del alumno en dislikedAlumno.dislikes
     const index = dislikedAlumno.dislikes.findIndex(dislike => dislike.alumnoId.toString() === alumnoId);
     if (index === -1) {
       return [null, "El alumno no ha dado dislike a este alumno"];
     }
 
-    // Eliminar el dislike del array de dislikes
     dislikedAlumno.dislikes.splice(index, 1);
     await dislikedAlumno.save();
 
@@ -284,11 +305,10 @@ async function removeDislikeAlumno(alumnoId, dislikedAlumnoId) {
   }
 }
 
-
 async function destacarPerfilAlumno(alumnoId, destacarAlumnoId) {
   try {
     console.log(`Intentando encontrar al alumno con ID: ${alumnoId}`);
-    const alumno = await Alumno.findById(alumnoId);
+    const alumno = await Alumno.findById(alumnoId).exec();
     if (!alumno) {
       console.log(`El alumno que intenta destacar no existe: ${alumnoId}`);
       return [null, "El alumno que destaca no existe"];
@@ -300,7 +320,7 @@ async function destacarPerfilAlumno(alumnoId, destacarAlumnoId) {
     }
 
     console.log(`Intentando encontrar al alumno a destacar con ID: ${destacarAlumnoId}`);
-    const destacarAlumno = await Alumno.findById(destacarAlumnoId);
+    const destacarAlumno = await Alumno.findById(destacarAlumnoId).exec();
     if (!destacarAlumno) {
       console.log(`El alumno a destacar no existe: ${destacarAlumnoId}`);
       return [null, "El alumno a destacar no existe"];
@@ -312,6 +332,7 @@ async function destacarPerfilAlumno(alumnoId, destacarAlumnoId) {
     }
 
     alumno.destacado = `${destacarAlumno.nombre} ${destacarAlumno.apellidos}`;
+    alumno.destacadoRole = destacarAlumno.role;  // Agregar role destacado
     await alumno.save();
 
     console.log(`Se ha destacado correctamente: ${destacarAlumno.nombre} ${destacarAlumno.apellidos}`);
@@ -322,25 +343,17 @@ async function destacarPerfilAlumno(alumnoId, destacarAlumnoId) {
       return [null, 'El ID no es válido, ingrese un ID válido'];
     }
     console.error(error);
-    return [null, "Error al destacar el perfil del alumno"];
+    return [null, "Error al destacar el perfil"];
   }
 }
-
 
 async function quitarDestacadoPerfilAlumno(alumnoId, destacarAlumnoId) {
   try {
     console.log(`Intentando encontrar al alumno con ID: ${alumnoId}`);
-    const alumno = await Alumno.findById(alumnoId);
+    const alumno = await Alumno.findById(alumnoId).exec();
     if (!alumno) {
       console.log(`El alumno que intenta quitar el destacado no existe: ${alumnoId}`);
       return [null, "El alumno que quita el destacado no existe"];
-    }
-
-    console.log(`Intentando encontrar al alumno a quitar destacado con ID: ${destacarAlumnoId}`);
-    const destacarAlumno = await Alumno.findById(destacarAlumnoId);
-    if (!destacarAlumno) {
-      console.log(`El alumno a quitar destacado no existe: ${destacarAlumnoId}`);
-      return [null, "El alumno a quitar destacado no existe"];
     }
 
     if (alumno.destacado !== `${destacarAlumno.nombre} ${destacarAlumno.apellidos}`) {
@@ -348,18 +361,19 @@ async function quitarDestacadoPerfilAlumno(alumnoId, destacarAlumnoId) {
       return [null, "El alumno no está destacado"];
     }
 
-    alumno.destacado = [];
+    alumno.destacado = null;
+    alumno.destacadoRole = null;  // Quitar role destacado
     await alumno.save();
 
-    console.log(`Se ha quitado el destacado correctamente: ${destacarAlumno.nombre} ${destacarAlumno.apellidos}`);
-    return [alumno, `Se ha quitado el destacado a ${destacarAlumno.nombre} ${destacarAlumno.apellidos} correctamente`];
+    console.log(`Se ha quitado el destacado correctamente: ${destacarAlumnoId}`);
+    return [alumno, "Se ha quitado el destacado correctamente"];
   } catch (error) {
     if (error.name === 'CastError') {
       console.error('El ID no es válido, ingrese un ID válido');
       return [null, 'El ID no es válido, ingrese un ID válido'];
     }
     console.error(error);
-    return [null, "Error al quitar el destacado del perfil del alumno"];
+    return [null, "Error al quitar el destacado"];
   }
 }
 

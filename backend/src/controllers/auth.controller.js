@@ -6,8 +6,8 @@ import { handleError } from "../utils/errorHandler.js";
 
 /** Servicios de autenticación */
 import AuthService from "../services/auth.service.js";
-import { authLoginBodySchema, authRegisterBodySchema } from "../schema/auth.schema.js";
-import { alumnoSchema } from "../schema/alumno.schema.js"; // Importa el esquema de validación de alumnos
+import { authLoginBodySchema} from "../schema/auth.schema.js";
+import { userSchema } from "../schema/user.schema.js";
 
 /**
  * Inicia sesión con un usuario.
@@ -83,7 +83,7 @@ async function refresh(req, res) {
 async function register(req, res) {
   try {
     const { body } = req;
-    const { error: bodyError } = authRegisterBodySchema.validate(body);
+    const { error: bodyError } = userSchema.validate(body);
     if (bodyError) return respondError(req, res, 400, bodyError.message);
 
     const result = await AuthService.register(body);

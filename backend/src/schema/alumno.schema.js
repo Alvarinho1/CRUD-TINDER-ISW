@@ -1,6 +1,7 @@
 import Joi from "joi";
+import ROLES from "../constants/roles.constants.js";
 
-const alumnoSchema = Joi.object({
+const alumnoBodySchema = Joi.object({
   nombre: Joi.string().required().messages({
     "string.empty": "El nombre no puede estar vacío.",
     "any.required": "El nombre es obligatorio.",
@@ -24,10 +25,10 @@ const alumnoSchema = Joi.object({
     "string.max": "El rut debe tener menos de 10 caracteres.",
     "string.pattern.base": "El rut tiene el formato XXXXXXXX-X, ejemplo: 12345678-9.",
   }),
-  correo: Joi.string().pattern(/^[a-zA-Z0-9._%+-]+@alumnos\.ubiobio\.cl$/).required().messages({
-    "string.empty": "El correo electrónico no puede estar vacío.",
-    "any.required": "El correo electrónico es obligatorio.",
-    "string.pattern.base": "El correo electrónico debe tener la extensión @alumnos.ubiobio.cl.",
+  email: Joi.string().pattern(/^[a-zA-Z0-9._%+-]+@alumnos\.ubiobio\.cl$/).required().messages({
+    "string.empty": "El email electrónico no puede estar vacío.",
+    "any.required": "El email electrónico es obligatorio.",
+    "string.pattern.base": "El email electrónico debe tener la extensión @alumnos.ubiobio.cl.",
   }),
   carrera: Joi.string().valid(
     "Arquitectura",
@@ -91,8 +92,21 @@ const alumnoSchema = Joi.object({
     "any.required": "La contraseña es obligatoria.",
     "string.pattern.base": "La contraseña debe tener al menos 8 caracteres, incluyendo una letra, un número y un carácter especial.",
   }),
+  roles: Joi.array()
+    .items(Joi.string().valid(...ROLES))
+    .messages({
+      "array.base": "El rol debe ser de tipo array.",
+      "string.base": "El rol debe ser de tipo string.",
+      "any.only": "El rol proporcionado no es válido.",
+    }),
+  newPassword: Joi.string().min(5).messages({
+    "string.empty": "La nueva contraseña no puede estar vacía.",
+    "string.base": "La nueva contraseña debe ser de tipo string.",
+    "string.min": "La nueva contraseña debe tener al menos 5 caracteres.",
+  }),
 }).messages({
   "object.unknown": "No se permiten propiedades adicionales.",
 });
 
-export { alumnoSchema };
+
+export { alumnoBodySchema };

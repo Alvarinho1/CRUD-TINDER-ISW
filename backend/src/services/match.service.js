@@ -18,39 +18,38 @@ async function getMatchById(id) {
     if (!match) return [null, "El match no existe"];
     return [match, null];
   } catch (error) {
-    handleError(error, "match.service -> getMatchById");
+    handleError(error, "matches.service -> getMatchById");
     return [null, "Error al obtener el match"];
   }
 }
 
-async function getMatchesByAlumnoId(id) {
+async function getMatchesByUserId(id) {
   try {
-    //buscar todos los Matches donde el id sea igual a alumnoId o matchAlumnoId
-    const matches = await Match.find({ $or: [{ alumnoId: id }, { matchAlumnoId: id }] }).exec();
-    if (!matches) return [null, "No hay matches para este alumno"];
+    // Buscar todos los Matches donde el id sea igual a userId o matchUserId
+    const matches = await Match.find({ $or: [{ userId: id }, { matchUserId: id }] }).exec();
+    if (!matches) return [null, "No hay matches para este usuario"];
     return [matches, null];
   } catch (error) {
-    handleError(error, "match.service -> getMatchesByAlumnoId");
-    return [null, "Error al obtener matches para este alumno"];
+    handleError(error, "matches.service -> getMatchesByUserId");
+    return [null, "Error al obtener matches para este usuario"];
   }
 }
 
-async function createMatch(alumnoId, matchAlumnoId) {
+async function createMatch(userId, matchUserId) {
   try {
-
-    //buscar si ya existe un match entre los dos alumnos
-    const matchFound = await Match.findOne({ $or: [{ alumnoId, matchAlumnoId }, { alumnoId: matchAlumnoId, matchAlumnoId: alumnoId }] });
+    // Buscar si ya existe un match entre los dos usuarios
+    const matchFound = await Match.findOne({ $or: [{ userId, matchUserId }, { userId: matchUserId, matchUserId: userId }] });
     if (matchFound) return [null, "El match ya existe"];
 
     const newMatch = new Match({
-      alumnoId,
-      matchAlumnoId,
+      userId,
+      matchUserId,
     });
     await newMatch.save();
 
     return [newMatch, null];
   } catch (error) {
-    handleError(error, "match.service -> createMatch");
+    handleError(error, "matches.service -> createMatch");
     return [null, "Error al crear el match"];
   }
 }
@@ -58,6 +57,6 @@ async function createMatch(alumnoId, matchAlumnoId) {
 export default {
   getMatches,
   getMatchById,
-  getMatchesByAlumnoId,
+  getMatchesByUserId,
   createMatch,
 };
