@@ -27,10 +27,10 @@ const userSchema = Joi.object({
     "string.max": "El rut debe tener menos de 10 caracteres.",
     "string.pattern.base": "El rut tiene el formato XXXXXXXX-X, ejemplo: 12345678-9.",
   }),
-  email: Joi.string().email().required().messages({
+  email: Joi.string().pattern(/^[a-zA-Z0-9._%+-]+@alumnos\.ubiobio\.cl$/).required().messages({
     "string.empty": "El email electrónico no puede estar vacío.",
     "any.required": "El email electrónico es obligatorio.",
-    "string.email": "El email electrónico debe ser válido.",
+    "string.pattern.base": "El email electrónico debe tener la extensión @alumnos.ubiobio.cl.",
   }),
   carrera: Joi.string().valid(
     "Arquitectura",
@@ -101,11 +101,7 @@ const userSchema = Joi.object({
       "string.base": "El rol debe ser de tipo string.",
       "any.only": "El rol proporcionado no es válido.",
     }),
-  newPassword: Joi.string().min(5).messages({
-    "string.empty": "La nueva contraseña no puede estar vacía.",
-    "string.base": "La nueva contraseña debe ser de tipo string.",
-    "string.min": "La nueva contraseña debe tener al menos 5 caracteres.",
-  }),
+    
 }).messages({
   "object.unknown": "No se permiten propiedades adicionales.",
 });

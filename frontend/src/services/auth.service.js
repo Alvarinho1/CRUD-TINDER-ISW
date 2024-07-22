@@ -1,40 +1,54 @@
-import axios from './root.service';
+import axios from './root.service.js';
 import cookies from 'js-cookie';
-import jwtDecode from 'jwt-decode';
 
-export const login = async ({ email, password }) => {
-  try {
-    const response = await axios.post('auth/login', {
-      email,
-      password,
-    });
-    const { status, data } = response;
-    if (status === 200) {
-      const { email, roles } = await jwtDecode(data.data.accessToken);
-      localStorage.setItem('user', JSON.stringify({ email, roles }));
-      axios.defaults.headers.common[
-        'Authorization'
-      ] = `Bearer ${data.data.accessToken}`;
+export async function login(data) {
+    try {
+        const response = await axios.post('/auth/login', data);
+        const {status} = response;
+        if(status === 200) {
+            sessionStorage.setItem('usuario', JSON.stringify(response.data));
+        }
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || error.message;
     }
-  } catch (error) {
-    console.log(error);
-  }
-};
+}
 
-export const logout = () => {
-  localStorage.removeItem('user');
-  delete axios.defaults.headers.common['Authorization'];
-  cookies.remove('jwt');
-};
-
-export const test = async () => {
-  try {
-    const response = await axios.get('/users');
-    const { status, data } = response;
-    if (status === 200) {
-      console.log(data.data);
+export async function register(data) {
+    try {
+        const response = await axios.post('/auth/register', data);
+        return response.data;
+    } catch (error) {
+        // Verifica si error.response existe y contiene datos
+        if (error.response && error.response.data) {
+            throw error.response.data;
+        } else {
+            // Si no hay respuesta, lanza un error genérico
+            throw { message: 'Error desconocido al registrar.' };
+        }
     }
-  } catch (error) {
-    console.log(error);
-  }
-};
+}
+
+export async function profile() {
+    try {
+        const config = {
+            headers: {
+                'Cache-Control': 'no-cache'
+            }
+        }
+        const data = await axios.get('/auth/profile', config)
+        return data;
+    } catch (error) {
+        throw error.response?.data || error.message;
+    }
+}
+
+export async function logout() {
+    try {
+        await axios.post('/auth/logout');
+        sessionStorage.removeItem('usuario');
+        cookies.remove('miCookie');
+    } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+    }
+}
