@@ -11,10 +11,10 @@ const router = Router();
 router.use(authenticationMiddleware);
 
 // Rutas básicas de usuario
-router.get("/", isAdmin, userController.getUsers);
+router.get("/", isAdmin, isAlumno, userController.getUsers);
 router.post("/", isAdmin, upload.single('fotoPerfil'), userController.createUser);
-router.get("/:rut", isAlumno, userController.getUserByRut);
-router.put("/:rut", isAlumno, userController.updateUser);
+router.get("/:rut", isAdmin, userController.getUserByRut);
+router.put("/:rut", isAdmin, isAlumno, userController.updateUser);
 router.delete("/:rut", isAdmin, userController.deleteUser);
 
 // Funciones adicionales
@@ -23,7 +23,7 @@ router.post("/dislike", isAlumno, userController.dislikeUser);
 router.delete("/alumno/removelike", isAlumno, userController.removeLikeUser);
 router.delete("/alumno/removedislike", isAlumno, userController.removeDislikeUser);
 
-router.post("/alumno/destacarperfil", isAdmin, userController.destacarPerfilUser);
-router.delete("/alumno/quitardestacado", isAdmin, userController.quitarDestacadoPerfilUser);
+router.post("/alumno/destacarperfil", isAlumno, userController.destacarPerfilUser);
+router.delete("/alumno/quitardestacado", isAlumno, userController.quitarDestacadoPerfilUser);
 
 export default router;

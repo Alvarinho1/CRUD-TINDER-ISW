@@ -10,7 +10,7 @@ const router = Router();
 router.use(authenticationMiddleware);
 
 router.get("/", isAdmin, matchController.getMatches);
-router.get("/:id", isAlumno, matchController.getMatch);
+router.get("/:id", isAdmin, isAlumno, matchController.getMatch);
 router.get("/alumno/:id", isAlumno, matchController.getMatchesByUser);
 
 export default router;

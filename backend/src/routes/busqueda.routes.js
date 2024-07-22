@@ -8,13 +8,13 @@ const router = Router();
 
 router.use(authenticationMiddleware);
 
-router.get("/buscarDisponibles", isAdmin, BusquedaController.BuscarDisponibles);
-router.post("/buscarPorCategoria",isAlumno, BusquedaController.BuscarPorCategoria);
+router.get("/buscarDisponibles", isAdmin, isAlumno, BusquedaController.BuscarDisponibles);
+router.post("/buscarPorCategoria",isAdmin, isAlumno, BusquedaController.BuscarPorCategoria);
 
-router.get("/likes", isAdmin, isAlumno, BusquedaController.BuscarLikesUser);
-router.get("/dislikes", isAdmin, isAlumno, BusquedaController.BuscarDislikesUser);
+router.get("/likes", isAdmin, BusquedaController.BuscarLikesUser);
+router.get("/dislikes", isAdmin, BusquedaController.BuscarDislikesUser);
 router.get("/alumno/likes/:rut", isAdmin, BusquedaController.BuscarLikesUserByRut);
 router.get("/alumno/dislikes/:rut", isAdmin, BusquedaController.BuscarDislikesUserByRut);
-router.get("/alumno/ranking", isAdmin, isAlumno, BusquedaController.RankingUsers);
+router.get("/alumno/ranking", isAdmin, BusquedaController.RankingUsers);
 
 export default router;

@@ -4,15 +4,17 @@ import Joi from "joi";
 import ROLES from "../constants/roles.constants.js";
 
 const userSchema = Joi.object({
-  nombre: Joi.string().required().messages({
+  nombre: Joi.string().pattern(/^[A-Za-z\s]+$/).required().messages({
     "string.empty": "El nombre no puede estar vacío.",
     "any.required": "El nombre es obligatorio.",
     "string.base": "El nombre debe ser de tipo string.",
+    "string.pattern.base": "El nombre solo puede contener letras y espacios.",
   }),
-  apellidos: Joi.string().required().messages({
+  apellidos: Joi.string().pattern(/^[A-Za-z\s]+$/).required().messages({
     "string.empty": "Los apellidos no pueden estar vacíos.",
     "any.required": "Los apellidos son obligatorios.",
     "string.base": "Los apellidos deben ser de tipo string.",
+    "string.pattern.base": "Los apellidos solo pueden contener letras y espacios.",
   }),
   genero: Joi.string().valid("masculino", "femenino").required().messages({
     "any.only": "El género proporcionado no es válido.",
