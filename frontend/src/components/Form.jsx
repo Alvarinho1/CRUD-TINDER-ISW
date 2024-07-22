@@ -1,16 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const Form = ({ title, fields, buttonText, onSubmit, footerContent, backgroundColor }) => {
-    const [formData, setFormData] = useState({});
+    const initialFormData = fields.reduce((acc, field) => {
+        acc[field.name] = '';
+        return acc;
+    }, {});
+
+    const [formData, setFormData] = useState(initialFormData);
+
+    useEffect(() => {
+        setFormData(initialFormData);
+    }, [fields]);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
-        
+
         // Convertir los campos de cursos y áreas de interés a arrays
         if (name === 'cursos' || name === 'areasDeInteres') {
             setFormData({
                 ...formData,
-                [name]: value ? value.split(',').map(item => item.trim()) : [], // Convertir a array
+                [name]: value.split(',').map(item => item.trim()), // Convertir a array manteniendo espacios dentro de cada item
             });
         } else {
             setFormData({
@@ -22,10 +31,16 @@ const Form = ({ title, fields, buttonText, onSubmit, footerContent, backgroundCo
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        if (!formData.carrera || !formData.genero) {
-            alert('Por favor, completa todos los campos requeridos.');
-            return;
+
+        // Verificar todos los campos requeridos
+        const requiredFields = fields.filter(field => field.required);
+        for (let field of requiredFields) {
+            if (!formData[field.name] || formData[field.name].length === 0) {
+                alert('Por favor, completa todos los campos requeridos.');
+                return;
+            }
         }
+
         onSubmit(formData);
     };
 
