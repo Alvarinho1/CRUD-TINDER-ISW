@@ -37,10 +37,10 @@ async function BuscarPorCategoria(req, res) {
 
 async function BuscarLikesUser(req, res) {
     try {
-        const [users, error] = await BusquedaServicio.BuscarLikesUser();
+        const [user, error] = await BusquedaServicio.BuscarLikesUser();
         if (error) return respondError(req, res, 400, error);
-        if (!users || users.length === 0) return respondError(req, res, 400, "No se encontraron usuarios con likes");
-        respondSuccess(req, res, 200, users);
+        if (!user || user.length === 0) return respondError(req, res, 400, "No se encontraron alumnos con likes");
+        respondSuccess(req, res, 200, user);
     } catch (error) {
         handleError(error, "busqueda.controller -> BuscarLikesUser");
         respondError(req, res, 500, "Error interno del servidor");
@@ -49,10 +49,10 @@ async function BuscarLikesUser(req, res) {
 
 async function BuscarDislikesUser(req, res) {
     try {
-        const [users, error] = await BusquedaServicio.BuscarDislikesUser();
+        const [user, error] = await BusquedaServicio.BuscarDislikesUser();
         if (error) return respondError(req, res, 400, error);
-        if (!users || users.length === 0) return respondError(req, res, 400, "No se encontraron usuarios con dislikes");
-        respondSuccess(req, res, 200, users);
+        if (!user || user.length === 0) return respondError(req, res, 400, "No se encontraron usuarios con dislikes");
+        respondSuccess(req, res, 200, user);
     } catch (error) {
         handleError(error, "busqueda.controller -> BuscarDislikesUser");
         respondError(req, res, 500, "Error interno del servidor");
@@ -62,10 +62,10 @@ async function BuscarDislikesUser(req, res) {
 async function BuscarLikesUserByRut(req, res) {
     try {
         const { rut } = req.params;
-        const [users, error] = await BusquedaServicio.BuscarLikesUserByRut(rut);
+        const [user, error] = await BusquedaServicio.BuscarLikesUserByRut(rut);
         if (error) return respondError(req, res, 400, error);
-        if (!users || users.length === 0) return respondError(req, res, 400, "Este usuario no tiene likes");
-        respondSuccess(req, res, 200, users);
+        if (!user || user.length === 0) return respondError(req, res, 400, "Este usuario no tiene likes");
+        respondSuccess(req, res, 200, user);
     } catch (error) {
         handleError(error, "busqueda.controller -> BuscarLikesUserByRut");
         respondError(req, res, 500, "Error interno del servidor");
@@ -75,10 +75,10 @@ async function BuscarLikesUserByRut(req, res) {
 async function BuscarDislikesUserByRut(req, res) {
     try {
         const { rut } = req.params;
-        const [users, error] = await BusquedaServicio.BuscarDislikesUserByRut(rut);
+        const [user, error] = await BusquedaServicio.BuscarDislikesUserByRut(rut);
         if (error) return respondError(req, res, 400, error);
-        if (!users || users.length === 0) return respondError(req, res, 400, "Este usuario no tiene dislikes");
-        respondSuccess(req, res, 200, users);
+        if (!user || user.length === 0) return respondError(req, res, 400, "Este usuario no tiene dislikes");
+        respondSuccess(req, res, 200, user);
     } catch (error) {
         handleError(error, "busqueda.controller -> BuscarDislikesUserByRut");
         respondError(req, res, 500, "Error interno del servidor");

@@ -70,99 +70,100 @@ async function BuscarPorCategoria(carrera, genero, cursos, areasDeInteres) {
         return [null, error.message];
     }
 }
-
-async function BuscarLikesUsuario() {
+async function BuscarLikesUser() {
     try {
-        const usuarios = await User.find(
-            { "likes.usuarioId": { $exists: true, $ne: [] } },
+        const user = await User.find(
+            { "likes.userId": { $exists: true, $ne: [] } },
             { nombre: 1, apellidos: 1, rut: 1, likes: 1 }
         );
 
-        if (!usuarios || usuarios.length === 0) {
-            return [null, "No hay ningún usuario con likes"];
+        if (!user || user.length === 0) {
+            return [null, "No hay ningún alumno con likes"];
         }
 
-        const populatedUsuarios = await User.populate(usuarios, { path: "likes.usuarioId", select: "id nombre apellidos" });
+        // Ejemplo de cómo manejar los datos de 'likes' manualmente
+        const populatedUsers = await User.populate(user, { path: "likes.userId" });
 
-        return [populatedUsuarios, null];
+        // Procesar y devolver los datos como desees
+        return [populatedUsers, null];
     } catch (error) {
-        handleError(error, "busqueda.service -> BuscarLikesUsuario");
+        handleError(error, "busqueda.service -> BuscarLikesUser");
         return [null, error.message];
     }
 }
 
-async function BuscarDislikesUsuario() {
+async function BuscarDislikesUser() {
     try {
-        const usuarios = await User.find(
+        const user = await User.find(
             { dislikes: { $exists: true, $ne: [] } },
             { nombre: 1, apellidos: 1, rut: 1, dislikes: 1 }
         );
 
-        if (!usuarios || usuarios.length === 0) {
+        if (!user || user.length === 0) {
             return [null, "No hay ningún usuario con dislikes"];
         }
 
-        const populatedUsuarios = await User.populate(usuarios, { path: "dislikes.usuarioId", select: "id nombre apellidos" });
+        const populatedUsers = await User.populate(user, { path: "dislikes.userId", select: "id nombre apellidos" });
 
-        return [populatedUsuarios, null];
+        return [populatedUsers, null];
     } catch (error) {
-        handleError(error, "busqueda.service -> BuscarDislikesUsuario");
+        handleError(error, "busqueda.service -> BuscarDislikesUser");
         return [null, error.message];
     }
 }
 
-async function BuscarLikesUsuarioRut(rut) {
+async function BuscarLikesUserByRut(rut) {
     try {
-        const usuario = await User.findOne({ rut }, { nombre: 1, apellidos: 1, rut: 1, likes: 1 });
-        if (!usuario) return [null, "El usuario no existe"];
+        const user = await User.findOne({ rut }, { nombre: 1, apellidos: 1, rut: 1, likes: 1 });
+        if (!user) return [null, "El usuario no existe"];
 
-        if (!usuario.likes || usuario.likes.length === 0) {
+        if (!user.likes || user.likes.length === 0) {
             return [null, "El usuario no tiene likes"];
         }
 
-        const populatedUsuario = await User.populate(usuario, { path: "likes.usuarioId", select: "id nombre apellidos" });
+        const populatedUsers = await User.populate(user, { path: "likes.userId", select: "id nombre apellidos" });
 
-        return [populatedUsuario, null];
+        return [populatedUsers, null];
     } catch (error) {
-        handleError(error, "busqueda.service -> BuscarLikesUsuarioRut");
+        handleError(error, "busqueda.service -> BuscarLikesUserByRut");
         return [null, error.message];
     }
 }
 
-async function BuscarDislikesUsuarioRut(rut) {
+async function BuscarDislikesUserByRut(rut) {
     try {
-        const usuario = await User.findOne({ rut }, { nombre: 1, apellidos: 1, rut: 1, dislikes: 1 });
-        if (!usuario) return [null, "El usuario no existe"];
+        const user = await User.findOne({ rut }, { nombre: 1, apellidos: 1, rut: 1, dislikes: 1 });
+        if (!user) return [null, "El usuario no existe"];
 
-        if (!usuario.dislikes || usuario.dislikes.length === 0) {
+        if (!user.dislikes || user.dislikes.length === 0) {
             return [null, "El usuario no tiene dislikes"];
         }
 
-        const populatedUsuario = await User.populate(usuario, { path: "dislikes.usuarioId", select: "id nombre apellidos" });
+        const populatedUsers = await User.populate(user, { path: "dislikes.userId", select: "id nombre apellidos" });
 
-        return [populatedUsuario, null];
+        return [populatedUsers, null];
     } catch (error) {
-        handleError(error, "busqueda.service -> BuscarDislikesUsuarioRut");
+        handleError(error, "busqueda.service -> BuscarDislikesUserByRut");
         return [null, error.message];
     }
 }
 
-async function RankingUsuarios() {
+async function RankingUsers() {
     try {
-        const rankingUsuariosLikes = await User.aggregate([
+        const rankingUsersLikes = await User.aggregate([
             { $addFields: { likes: { $ifNull: ["$likes", []] } } },
             { $project: { nombre: 1, apellidos: 1, rut: 1, likeCount: { $size: "$likes" }, points: { $multiply: [{ $size: "$likes" }, 50] } } },
             { $sort: { points: -1 } },
             { $limit: 10 }
         ]);
 
-        if (!rankingUsuariosLikes || rankingUsuariosLikes.length === 0) {
+        if (!rankingUsersLikes || rankingUsersLikes.length === 0) {
             return [null, "No se encontraron usuarios con likes"];
         }
 
-        return [rankingUsuariosLikes, null];
+        return [rankingUsersLikes, null];
     } catch (error) {
-        handleError(error, "busqueda.service -> RankingUsuariosLikes");
+        handleError(error, "busqueda.service -> RankingUsersLikes");
         return [null, error.message];
     }
 }
@@ -170,9 +171,9 @@ async function RankingUsuarios() {
 export default {
     BuscarDisponibles,
     BuscarPorCategoria,
-    BuscarLikesUsuario,
-    BuscarDislikesUsuario,
-    BuscarLikesUsuarioRut,
-    BuscarDislikesUsuarioRut,
-    RankingUsuarios
+    BuscarLikesUser,
+    BuscarDislikesUser,
+    BuscarLikesUserByRut,
+    BuscarDislikesUserByRut,
+    RankingUsers
 };

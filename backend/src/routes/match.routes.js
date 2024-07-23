@@ -10,7 +10,8 @@ const router = Router();
 router.use(authenticationMiddleware);
 
 router.get("/", isAdmin, matchController.getMatches);
-router.get("/:id", isAdmin, isAlumno, matchController.getMatch);
-router.get("/alumno/:id", isAlumno, matchController.getMatchesByUser);
+router.get("/:id",  matchController.getMatch);
+router.get("/alumno/:id", matchController.getMatchesByUserId);
+router.delete("/alumnodelete/:id", isAlumno, matchController.deleteMatchById);
 
 export default router;

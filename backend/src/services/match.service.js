@@ -3,83 +3,95 @@ import { handleError } from "../utils/errorHandler.js";
 
 async function getMatches() {
   try {
+    // Buscar todos los matches en la base de datos.
     const matches = await Match.find().exec();
-    if (!matches || matches.length === 0) return [null, "No hay matches"];
+
+    // Verificar si el array de matches está vacío.
+    if (matches.length === 0) {
+      return [null, "No hay matches disponibles"];
+    }
+
+    // Devolver los matches encontrados.
     return [matches, null];
   } catch (error) {
-    handleError(error, "matches.service -> getMatches");
+    // Manejar errores y devolver mensaje de error.
+    handleError(error, "match.service -> getMatches");
     return [null, "Error al obtener los matches"];
   }
 }
 
 async function getMatchById(id) {
   try {
+    // Buscar el match por ID en la base de datos.
     const match = await Match.findById(id).exec();
-    if (!match) return [null, "El match no existe"];
+
+    // Verificar si se encontró el match.
+    if (!match) {
+      return [null, "El match no existe"];
+    }
+
+    // Devolver el match encontrado.
     return [match, null];
   } catch (error) {
-    handleError(error, "matches.service -> getMatchById");
+    // Manejar errores y devolver mensaje de error.
+    handleError(error, "match.service -> getMatchById");
     return [null, "Error al obtener el match"];
   }
 }
 
 async function getMatchesByUserId(id) {
   try {
-    // Validar que el id sea válido
-    if (!id) {
-      const errorMessage = "El ID del usuario es requerido";
-      handleError(new Error(errorMessage), "matches.service -> getMatchesByUserId - Falta ID");
-      return [null, errorMessage];
+    // Buscar todos los matches donde el ID sea igual a userId o matchUserId.
+    const matches = await Match.find({ $or: [{ userId: id }, { matchUserId: id }] }).exec();
+
+    // Verificar si se encontraron matches.
+    if (matches.length === 0) {
+      return [null, "No hay matches para este alumno"];
     }
 
-    const matches = await Match.find({ $or: [{ userId: id }, { matchUserId: id }] }).exec();
-    if (!matches || matches.length === 0) return [null, "No hay matches para este usuario"];
+    // Devolver los matches encontrados.
     return [matches, null];
   } catch (error) {
-    handleError(error, "matches.service -> getMatchesByUserId");
-    return [null, "Error al obtener matches para este usuario"];
+    // Manejar errores y devolver mensaje de error.
+    handleError(error, "match.service -> getMatchesByUserId");
+    return [null, "Error al obtener los matches"];
   }
 }
 
 async function createMatch(userId, matchUserId) {
   try {
-    if (!userId || !matchUserId) {
-      const errorMessage = "userId y matchUserId son requeridos";
-      handleError(new Error(errorMessage), "matches.service -> createMatch - Falta información");
-      return [null, errorMessage];
-    }
 
-    // Buscar si ya existe un match entre los dos usuarios
-    const matchFound = await Match.findOne({
-      $or: [
-        { userId, matchUserId },
-        { userId: matchUserId, matchUserId: userId }
-      ]
-    }).exec();
-
-    if (matchFound) {
-      const errorMessage = "El match ya existe";
-      handleError(new Error(errorMessage), "matches.service -> createMatch - Match ya existe");
-      return [null, errorMessage];
-    }
+    //buscar si ya existe un match entre los dos alumnos
+    const matchFound = await Match.findOne({ $or: [{ userId, matchUserId }, { userId: matchUserId, matchUserId: userId }] });
+    if (matchFound) return [null, "El match ya existe"];
 
     const newMatch = new Match({
       userId,
-      matchUserId
+      matchUserId,
     });
-
     await newMatch.save();
 
     return [newMatch, null];
   } catch (error) {
-    handleError(error, "matches.service -> createMatch");
+    handleError(error, "match.service -> createMatch");
     return [null, "Error al crear el match"];
   }
 }
 
+async function deleteMatchById(id) {
+  try {
+    const result = await Match.findByIdAndDelete(id).exec();
+    if (!result) return [null, "El match no existe"];
+    return [result, null];
+  } catch (error) {
+    handleError(error, "match.service -> deleteMatchById");
+    return [null, "Error al eliminar el match"];
+  }
+}
 export default {
   getMatches,
   getMatchById,
   getMatchesByUserId,
   createMatch,
+  deleteMatchById
 };

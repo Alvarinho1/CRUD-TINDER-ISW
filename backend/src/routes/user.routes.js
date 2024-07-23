@@ -11,10 +11,10 @@ const router = Router();
 router.use(authenticationMiddleware);
 
 // Rutas básicas de usuario
-router.get("/", isAdmin, isAlumno, userController.getUsers);
+router.get("/", userController.getUsers);
 router.post("/", isAdmin, upload.single('fotoPerfil'), userController.createUser);
 router.get("/:rut", isAdmin, userController.getUserByRut);
-router.put("/:rut", isAdmin, isAlumno, userController.updateUser);
+router.put("/:rut",  userController.updateUser);
 router.delete("/:rut", isAdmin, userController.deleteUser);
 
 // Funciones adicionales
