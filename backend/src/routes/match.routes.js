@@ -12,6 +12,9 @@ router.use(authenticationMiddleware);
 router.get("/", isAdmin, matchController.getMatches);
 router.get("/:id",  matchController.getMatch);
 router.get("/alumno/:id", matchController.getMatchesByUserId);
-router.delete("/alumnodelete/:id", isAlumno, matchController.deleteMatchById);
+router.delete("/alumnodelete/:id", matchController.deleteMatchById);
+router.put("/alumnodesabilitar/:id", matchController.disableMatchesByUserId);
+router.put("/alumnohabilitado/:id", matchController.enableMatchesByUserId);
+
 
 export default router;

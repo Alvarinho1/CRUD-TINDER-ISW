@@ -88,10 +88,48 @@ async function deleteMatchById(id) {
     return [null, "Error al eliminar el match"];
   }
 }
+
+
+async function disableMatchesByUserId(userId) {
+  try {
+    const result = await Match.updateMany(
+      { userId },
+      {
+        disabled: true,
+      },
+
+    );
+    return [result, null];
+  } catch (error) {
+    handleError(error, "match.service -> deleteMatchesByUserId");
+    return [null, "Error al eliminar los matches"];
+  }
+}
+
+async function enableMatchesByUserId(userId) {
+  try {
+    const result = await Match.updateMany(
+      { userId },
+      {
+        disabled: false,
+      },
+
+    );
+    return [result, null];
+  } catch (error) {
+    handleError(error, "match.service -> deleteMatchesByUserId");
+    return [null, "Error al eliminar los matches"];
+  }
+}
+
+
+
 export default {
   getMatches,
   getMatchById,
   getMatchesByUserId,
   createMatch,
-  deleteMatchById
+  deleteMatchById,
+  disableMatchesByUserId,
+  enableMatchesByUserId
 };

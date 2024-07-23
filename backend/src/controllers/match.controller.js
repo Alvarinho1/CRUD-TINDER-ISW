@@ -56,9 +56,52 @@ async function getMatchesByUserId(req, res) {
     }
   }
 
+
+  async function disableMatchesByUserId(req, res) {
+    try {
+      const { params } = req;
+      const [result, error] = await MatchService.disableMatchesByUserId(params.id);
+  
+      if (error) {
+        return respondError(req, res, 500, error); // Error interno del servidor
+      }
+  
+      if (result.modifiedCount === 0) {
+        return respondError(req, res, 404, "No se encontraron matches para deshabilitar"); // No se encontraron matches
+      }
+  
+      respondSuccess(req, res, 200, `Matches deshabilitados exitosamente. Documentos modificados: ${result.modifiedCount}`);
+    } catch (error) {
+      respondError(req, res, 500, "Error interno del servidor");
+    }
+  }
+
+  async function enableMatchesByUserId(req, res) {
+    try {
+      const { params } = req;
+      const [result, error] = await MatchService.enableMatchesByUserId(params.id);
+  
+      if (error) {
+        return respondError(req, res, 500, error); // Error interno del servidor
+      }
+  
+      if (result.modifiedCount === 0) {
+        return respondError(req, res, 404, "No se encontraron matches para habilitar"); // No se encontraron matches
+      }
+  
+      respondSuccess(req, res, 200, `Matches habilitados exitosamente. Documentos modificados: ${result.modifiedCount}`);
+    } catch (error) {
+      respondError(req, res, 500, "Error interno del servidor");
+    }
+  }
+
+
+
 export default {
     getMatches,
     getMatch,
     getMatchesByUserId,
-    deleteMatchById
+    deleteMatchById,
+    disableMatchesByUserId,
+    enableMatchesByUserId
 };

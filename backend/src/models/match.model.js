@@ -13,7 +13,14 @@ const matchSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+
+    disabled: {
+      type: mongoose.Schema.Types.Boolean,
+      required: false,
+    },
+
   },
+  
   {
     versionKey: false,
   },
