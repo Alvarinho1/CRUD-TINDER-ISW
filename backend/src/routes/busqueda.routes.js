@@ -2,7 +2,7 @@
 import { Router } from "express";
 import BusquedaController from "../controllers/busqueda.controller.js";
 import authenticationMiddleware from "../middlewares/authentication.middleware.js";
-import { isAdmin, isAlumno } from "../middlewares/authorization.middleware.js";
+import { isAdmin, isUser } from "../middlewares/authorization.middleware.js";
 
 const router = Router();
 
