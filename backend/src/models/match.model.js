@@ -18,7 +18,6 @@ const matchSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.Boolean,
       required: false,
     },
-
   },
   
   {
