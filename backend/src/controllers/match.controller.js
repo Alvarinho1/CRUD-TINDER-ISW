@@ -95,7 +95,7 @@ async function getMatchesByUserId(req, res) {
     }
   }
 
-
+  
 
 export default {
     getMatches,

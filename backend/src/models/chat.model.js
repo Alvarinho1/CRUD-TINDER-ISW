@@ -1,6 +1,3 @@
-//genra un modelo para almacenar los chats. los chats se relacionan a un match y los mensajes se almacenan en el modelo chat indicando quien envia y quien recibe el mensaje
-// los mensajes del chat deben indicar el emisor y receptor del mensaje, el contenido del mensaje y la fecha de envio.
-// Importa el modulo 'mongoose' para crear la conexion a la base de datos
 import mongoose from "mongoose";
 
 // Crea el esquema de la colección 'chat'
@@ -10,7 +7,6 @@ const chatSchema = new mongoose.Schema({
             ref: "Match",
             required: true,
         },
-        
         messages: [{
             sender: {
                 type: mongoose.Schema.Types.ObjectId,
