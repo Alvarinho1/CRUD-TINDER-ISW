@@ -26,9 +26,9 @@ const AppRouter = () => {
       <Route 
         path="/users" 
         element={
-          <ProtectedRoute allowedRoles={['administrador']}>
+          
             <Users />
-          </ProtectedRoute>
+          
         } 
       />
       <Route 
@@ -47,7 +47,14 @@ const AppRouter = () => {
           </ProtectedRoute>
         } 
       />
-      
+            <Route 
+        path="/users/:id" 
+        element={
+          <ProtectedRoute>
+        
+          </ProtectedRoute>
+        } 
+      />
       <Route path="*" element={<Error404 />} />
     </Routes>
   );

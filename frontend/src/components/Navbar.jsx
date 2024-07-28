@@ -29,7 +29,7 @@ const Navbar = () => {
                 <li className={location.pathname === "/inicio" ? "active" : ""}>
                     <NavLink to="/home">Inicio</NavLink>
                 </li>
-                {userRole === 'administrador' && (
+                { (
                     <li className={location.pathname === "/usuarios" ? "active" : ""}>
                         <NavLink to="/users">Usuarios</NavLink>
                     </li>
@@ -37,6 +37,8 @@ const Navbar = () => {
                 <li className={location.pathname === "/perfil" ? "active" : ""}>
                     <NavLink to="/profile">Perfil</NavLink>
                 </li>
+   
+                
                 <li className={location.pathname === "/" ? "active" : ""}>
                     <NavLink to="/" onClick={logoutSubmit}>Cerrar</NavLink>
                 </li>
