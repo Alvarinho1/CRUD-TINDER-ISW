@@ -178,6 +178,20 @@ async function register(user) {
   }
 }
 
+async function profile(userId) {
+  try {
+    const user = await User.findById(userId).populate("roles").exec();
+    if (!user) {
+      return [null, "El usuario no existe"];
+    }
+    return [user, null];
+  } catch (error) {
+    handleError(error, "auth.service -> profile");
+    return [null, "Error al obtener el perfil del usuario"];
+  }
+}
 
 
-export default { login, refresh, register };
+
+
+export default { login, refresh, register, profile };

@@ -8,6 +8,7 @@ import EditUser from './pages/EditUser';
 import ProtectedRoute from './components/ProtectedRoute';
 import Users from './pages/Users';
 
+
 const AppRouter = () => {
   return (
     <Routes>
@@ -26,9 +27,9 @@ const AppRouter = () => {
       <Route 
         path="/users" 
         element={
-          
+     
             <Users />
-          
+        
         } 
       />
       <Route 
@@ -47,14 +48,7 @@ const AppRouter = () => {
           </ProtectedRoute>
         } 
       />
-            <Route 
-        path="/users/:id" 
-        element={
-          <ProtectedRoute>
-        
-          </ProtectedRoute>
-        } 
-      />
+
       <Route path="*" element={<Error404 />} />
     </Routes>
   );

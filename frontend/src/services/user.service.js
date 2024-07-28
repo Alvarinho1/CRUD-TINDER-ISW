@@ -16,6 +16,7 @@ export async function getUsers() {
 
 
 
+
 export async function getUserByRut(rut) {
     try {
         const { data } = await axios.get(`/users/${rut}`);
@@ -25,6 +26,7 @@ export async function getUserByRut(rut) {
         return [null, error.response?.data || error.message];
     }
 }
+
 
 export async function getUserById(id) {
     try {

@@ -37,7 +37,7 @@ const Navbar = () => {
                 <li className={location.pathname === "/perfil" ? "active" : ""}>
                     <NavLink to="/profile">Perfil</NavLink>
                 </li>
-   
+
                 
                 <li className={location.pathname === "/" ? "active" : ""}>
                     <NavLink to="/" onClick={logoutSubmit}>Cerrar</NavLink>

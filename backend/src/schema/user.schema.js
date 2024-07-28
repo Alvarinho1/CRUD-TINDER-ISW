@@ -103,6 +103,9 @@ const userSchema = Joi.object({
       "string.base": "El rol debe ser de tipo string.",
       "any.only": "El rol proporcionado no es válido.",
     }),
+      fotoPerfil: Joi.any().optional().messages({
+    "any.optional": "La foto de perfil es opcional."
+  })
     
 }).messages({
   "object.unknown": "No se permiten propiedades adicionales.",
