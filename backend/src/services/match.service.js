@@ -68,6 +68,7 @@ async function createMatch(userId, matchUserId) {
     const newMatch = new Match({
       userId,
       matchUserId,
+      disabled : false,
     });
     await newMatch.save();
 
