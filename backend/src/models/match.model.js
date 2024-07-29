@@ -17,7 +17,12 @@ const matchSchema = new mongoose.Schema(
     chatId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Chat",
-    }
+    },
+    disabled: {
+      type: mongoose.Schema.Types.Boolean,
+      required: false,
+      default: false,
+    },
   },
   {
     versionKey: false,
