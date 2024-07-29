@@ -2,18 +2,25 @@ import axios from './root.service.js';
 
 export async function getUsers() {
     try {
+        const token = sessionStorage.getItem('accessToken');
+        if (!token) {
+            throw new Error('No hay token disponible');
+        }
+
         const config = {
             headers: {
                 'Cache-Control': 'no-cache',
-                "Authorization" : `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGFsdW1ub3MudWJpb2Jpby5jbCIsInJvbGVzIjpbeyJfaWQiOiI2NjlkNzFlYmQ2NGEzNzFmMzc3Nzk2NTYiLCJuYW1lIjoiYWRtaW4ifV0sIm5vbWJyZSI6ImFkbWluIiwiYXBlbGxpZG9zIjoiYWRtaW5pc3RyYWRvciIsImlhdCI6MTcyMjIzMDU3OSwiZXhwIjoxNzIyMzE2OTc5fQ.wao96ExqwHE_nqp9-NpkUUeNof7gGfjM4AjXoTzNvCs`
+                'Authorization': `Bearer ${token.replace(/"/g, '')}` // Elimina las comillas adicionales si están presentes
             }
-        }
+        };
+
         const { data } = await axios.get('/users/', config);
         return data;
     } catch (error) {
         throw error.response?.data || error.message;
     }
 }
+
 
 
 
