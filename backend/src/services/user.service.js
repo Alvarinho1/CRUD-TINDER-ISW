@@ -68,6 +68,17 @@ async function getUserByRut(rut) {
   }
 }
 
+async function getUserByEmail(email) {
+  try {
+    const user = await User.findOne({ email }).populate('roles').exec();
+    if (!user) return [null, "El usuario no existe"];
+    return [user, null];
+  } catch (error) {
+    handleError(error, "user.service -> getUserByRut");
+    return [null, "Error al obtener el usuario"];
+  }
+}
+
 async function getUserById(id) {
   try {
     const user = await User.findById(id).populate('roles').exec();
@@ -384,4 +395,5 @@ export default {
   removeDislikeUser,
   destacarPerfilUser,
   quitarDestacadoPerfilUser,
+  getUserByEmail
 };

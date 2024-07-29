@@ -1,55 +1,38 @@
-import { responseError, respondSuccess } from "../utils/resHandler.js";
-import { createChat, getMessages, sendMessage } from "../services/chatService.js";
+import * as ChatService from "../services/chat.service.js";
 
-// Controlador para crear un chat
-export const createChat = async (req, res) => {
-  const { matchId, userId, matchUserId } = req.body;
-  try {
-    const response = await createChat(matchId, userId, matchUserId);
-    if (response.status === 200) {
-      return respondSuccess(res, response.status, response.message);
-    } else {
-      return responseError(res, response.status, response.message);
-    }
-  } catch (error) {
-    return responseError(res, 500, "Internal server error", error);
+// Obtener todos los chats
+const getAllChats = async (req, res) => {
+  const [chats, error] = await ChatService.getAllChats();
+  if (error) {
+    return res.status(500).json({ message: error });
   }
+  res.status(200).json(chats);
 };
 
-// Controlador para enviar un mensaje
-export const sendMessage = async (req, res) => {
-  const { matchId, senderId, receiverId, content } = req.body;
-  try {
-    const response = await sendMessage(matchId, senderId, receiverId, content);
-    if (response.status === 200) {
-      return respondSuccess(res, response.status, response.message);
-    } else {
-      return responseError(res, response.status, response.message);
-    }
-  } catch (error) {
-    return responseError(res, 500, "Internal server error", error);
+// Obtener un chat por ID
+const getChatById = async (req, res) => {
+  const { id } = req.params;
+  const [chat, error] = await ChatService.getChatById(id);
+  if (error) {
+    const statusCode = error === "Chat no encontrado" ? 404 : 500;
+    return res.status(statusCode).json({ message: error });
   }
+  res.status(200).json(chat);
 };
 
-// Controlador para obtener mensajes
-export const getMessages = async (req, res) => {
-  const { chatId } = req.params;
-  try {
-    const response = await getMessages(chatId);
-    if (response.status === 200) {
-      return respondSuccess(res, response.status, response.message, response.data);
-    } else {
-      return responseError(res, response.status, response.message);
-    }
-  } catch (error) {
-    return responseError(res, 500, "Internal server error", error);
+const updateChat = async (req, res) => {
+  const { id } = req.params;
+  const { userId, content } = req.body;
+  const [updatedChat, error] = await ChatService.updateChat(id, userId, content);
+  if (error) {
+    const statusCode = error === "Chat no encontrado" ? 404 : 500;
+    return res.status(statusCode).json({ message: error });
   }
+  res.status(200).json(updatedChat);
 };
 
-export default { 
-
-  createChat, 
-  sendMessage, 
-  getMessages 
-  
+export default {
+  getAllChats,
+  getChatById,
+  updateChat
 };

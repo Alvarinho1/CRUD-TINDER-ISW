@@ -1,16 +1,15 @@
-
-import chatController from "../controllers/chat.controller.js";
+"use strict";
 import { Router } from "express";
+import ChatController from "../controllers/chat.controller.js";
 import authenticationMiddleware from "../middlewares/authentication.middleware.js";
-import { isUser } from "../middlewares/authorization.middleware.js";
+import { isAdmin, isUser } from "../middlewares/authorization.middleware.js";
 
-const chatRouter = Router();    
+const router = Router();
 
-chatRouter.use(authenticationMiddleware);
-router.use("/chat", chatRouter);
+router.use(authenticationMiddleware);
 
-chatRouter.post("/create", isUser, chatController.createChat);
-chatRouter.get("/messages/:id", isUser, chatController.getMessages);
-chatRouter.post("/send", isUser, chatController.sendMessage);
- 
-export default chatRouter;
+router.get("/", isAdmin, ChatController.getAllChats); // Obtener todos los chats
+router.get("/:id", isUser, ChatController.getChatById); // Obtener un chat por ID
+router.put("/:id", isUser, ChatController.updateChat); // Actualizar un chat
+
+export default router;

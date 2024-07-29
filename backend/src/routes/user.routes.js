@@ -16,6 +16,7 @@ router.post("/", isAdmin, upload.single('fotoPerfil'), userController.createUser
 router.get("/:rut", isAdmin, userController.getUserByRut);
 router.put("/:rut",  userController.updateUser);
 router.delete("/:rut", isAdmin, userController.deleteUser);
+router.get("/email/:email", isAdmin, userController.getUserByEmail);
 
 // Funciones adicionales
 router.post("/like", isUser, userController.likeUser);

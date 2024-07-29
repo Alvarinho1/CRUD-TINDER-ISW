@@ -37,9 +37,9 @@ async function login(user) {
     if (!matchPassword) {
       return [null, null, "El usuario y/o contraseña son incorrectos"];
     }
-
+  
     const accessToken = jwt.sign(
-      { email: userFound.email, roles: userFound.roles },
+      { email: userFound.email, roles: userFound.roles, nombre: userFound.nombre, apellidos: userFound.apellidos },
       ACCESS_JWT_SECRET,
       {
         expiresIn: "1d",
@@ -84,7 +84,7 @@ async function refresh(cookies) {
         })
           .populate("roles")
           .exec();
-
+      
         if (!userFound) return [null, "No usuario no autorizado"];
 
         const accessToken = jwt.sign(

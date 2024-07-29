@@ -55,10 +55,21 @@ async function getUserByRut(req, res) {
   try {
     const { params } = req;
     const [user, error] = await UserService.getUserByRut(params.rut);
-
+  
     if (error) return respondError(req, res, 404, error);
-
+  
     respondSuccess(req, res, 200, user);
+  } catch (error) {
+    respondError(req, res, 500, "Error interno del servidor");
+  }
+}
+
+// Obtener un usuario por Email
+async function getUserByEmail(email) {
+  try {
+    const [user] = await UserService.getUserByEmail(email);
+  
+    return user;
   } catch (error) {
     respondError(req, res, 500, "Error interno del servidor");
   }
@@ -208,4 +219,5 @@ export default {
   removeDislikeUser,
   destacarPerfilUser,
   quitarDestacadoPerfilUser,
+  getUserByEmail
 };
