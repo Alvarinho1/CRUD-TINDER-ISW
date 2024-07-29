@@ -6,7 +6,7 @@ const Navbar = () => {
     const navigate = useNavigate();
 
     const storedUser = JSON.parse(sessionStorage.getItem('usuario'));
-    const userRole = storedUser?.data?.rolName;
+    const userRole = storedUser.roles[0].name
 
     const logoutSubmit = () => {
         try {
@@ -32,8 +32,8 @@ const Navbar = () => {
                 <li className={location.pathname === "/chat" ? "active" : ""}>
                     <NavLink to="/chat">Chat</NavLink>
                 </li>
-                {userRole === 'administrador' && (
-                    <li className={location.pathname === "/usuarios" ? "active" : ""}>
+                {userRole === 'admin' && (
+                    <li className={location.pathname === "/users" ? "active" : ""}>
                         <NavLink to="/users">Usuarios</NavLink>
                     </li>
                 )}

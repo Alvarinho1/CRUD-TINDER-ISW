@@ -8,6 +8,7 @@ export async function login(data) {
         const {status} = response;
         if(status === 200) {
             sessionStorage.setItem('usuario', JSON.stringify(response.data.data.dataUser));
+            sessionStorage.setItem('accessToken', JSON.stringify(response.data.data.accessToken));
         }
     
         return response.data;

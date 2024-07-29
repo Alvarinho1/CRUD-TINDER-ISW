@@ -4,7 +4,8 @@ export async function getUsers() {
     try {
         const config = {
             headers: {
-                'Cache-Control': 'no-cache'
+                'Cache-Control': 'no-cache',
+                "Authorization" : `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGFsdW1ub3MudWJpb2Jpby5jbCIsInJvbGVzIjpbeyJfaWQiOiI2NjlkNzFlYmQ2NGEzNzFmMzc3Nzk2NTYiLCJuYW1lIjoiYWRtaW4ifV0sIm5vbWJyZSI6ImFkbWluIiwiYXBlbGxpZG9zIjoiYWRtaW5pc3RyYWRvciIsImlhdCI6MTcyMjIzMDU3OSwiZXhwIjoxNzIyMzE2OTc5fQ.wao96ExqwHE_nqp9-NpkUUeNof7gGfjM4AjXoTzNvCs`
             }
         }
         const { data } = await axios.get('/users/', config);
