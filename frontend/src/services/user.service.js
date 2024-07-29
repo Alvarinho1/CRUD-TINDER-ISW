@@ -46,39 +46,35 @@ export async function getUserById(id) {
     }
 }
 
-export async function updateUser(rut, user) {
+export async function updateUserProfile(data) {
     try {
-        // Buscar el usuario existente
-        const userFound = await axios.get(`/users/?rut=${rut}`);
-        if (!userFound.data) return [null, "El usuario no existe"];
-
-        // Extraer campos del usuario, incluyendo roles
-        const { nombre, apellidos, genero, email, carrera, cursos, areasDeInteres, fotoPerfil, roles } = user;
-
-        // Si se proporcionan roles, validar su existencia
-        let roleIds = userFound.data.roles; // Mantener roles existentes por defecto
-        if (roles) {
-            const rolesFound = await axios.get('/roles/', { params: { name: { $in: roles } } });
-            if (rolesFound.data.length === 0) return [null, "El rol no existe"];
-            roleIds = rolesFound.data.map((role) => role._id); // Obtener IDs de los roles
+        const token = sessionStorage.getItem('accessToken');
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Cache-Control': 'no-cache'
+            }
         }
-
-        // Actualizar el usuario con los nuevos datos y roles
-        const userUpdated = await axios.put(`/users/?rut=${rut}`, {
-            nombre,
-            apellidos,
-            genero,
-            email,
-            carrera,
-            cursos,
-            areasDeInteres,
-            fotoPerfil,
-            roles: roleIds, // Asignar roles actualizados
-        });
-
-        return [userUpdated.data, null];
+        const {data} = await axios.put('/users', data, config);
+        return data;
     } catch (error) {
-        return [null, error.response?.data || error.message];
+        throw error.response?.data || error.message;
+    }
+}
+
+export async function updateUser(data, email) {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Cache-Control': 'no-cache'
+            }
+        }
+        const {data} = await axios.put(`/users/${email}`, data, config);
+        return data;
+    } catch (error) {
+        throw error.response?.data || error.message;
     }
 }
 

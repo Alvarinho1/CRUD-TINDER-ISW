@@ -5,12 +5,12 @@ import cookies from 'js-cookie';
 export async function login(data) {
     try {
         const response = await axios.post('/auth/login', data);
-        const {status} = response;
-        if(status === 200) {
+        const { status } = response;
+        if (status === 200) {
+            sessionStorage.setItem('accessToken', response.data.data.accessToken); // Guarda el token de acceso
             sessionStorage.setItem('usuario', JSON.stringify(response.data.data.dataUser));
             sessionStorage.setItem('accessToken', JSON.stringify(response.data.data.accessToken));
         }
-    
         return response.data;
     } catch (error) {
         throw error.response?.data || error.message;
