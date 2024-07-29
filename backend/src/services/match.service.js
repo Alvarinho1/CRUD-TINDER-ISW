@@ -22,12 +22,12 @@ async function getMatches() {
 
 async function getMatchById(id) {
   try {
-    // Buscar el match por ID en la base de datos.
-    const match = await Match.findById(id).exec();
-
+    // Buscar el match por ID en la base de datos, asegurándose de que el campo 'disabled' sea true.
+    const match = await Match.findOne({ _id: id, disabled: true }).exec();
+  
     // Verificar si se encontró el match.
     if (!match) {
-      return [null, "El match no existe"];
+      return [null, "El match no existe o no está deshabilitado"];
     }
 
     // Devolver el match encontrado.
@@ -68,6 +68,7 @@ async function createMatch(userId, matchUserId) {
     const newMatch = new Match({
       userId,
       matchUserId,
+      disabled : false,
     });
     await newMatch.save();
 

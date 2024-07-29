@@ -55,10 +55,21 @@ async function getUserByRut(req, res) {
   try {
     const { params } = req;
     const [user, error] = await UserService.getUserByRut(params.rut);
-
+  
     if (error) return respondError(req, res, 404, error);
-
+  
     respondSuccess(req, res, 200, user);
+  } catch (error) {
+    respondError(req, res, 500, "Error interno del servidor");
+  }
+}
+
+// Obtener un usuario por Email
+async function getUserByEmail(email) {
+  try {
+    const [user] = await UserService.getUserByEmail(email);
+  
+    return user;
   } catch (error) {
     respondError(req, res, 500, "Error interno del servidor");
   }
@@ -99,16 +110,14 @@ async function likeUser(req, res) {
   try {
     const { userId, likedUserId } = req.body;
     const [userLiked, error] = await UserService.likeUser(userId, likedUserId);
-
     const [user, errorUser] = await UserService.getUserById(userId);
 
-    //si alumnoId tiene un like de likedAlumnoId es un match, y guardas en match
+    //si alumnoId tiene un like de likedAlumnoId es un match, y se el match
     console.log("Buscar match", likedUserId, user.likes);
     if (user && user.likes.find(like => like.userId === likedUserId)) {
       console.log("Es un match", likedUserId, user.likes);
       const [match, errorMatch] = await MatchService.createMatch(userId, likedUserId);
     }
-
 
     if (error) return respondError(req, res, 400, error);
 
@@ -210,4 +219,5 @@ export default {
   removeDislikeUser,
   destacarPerfilUser,
   quitarDestacadoPerfilUser,
+  getUserByEmail
 };

@@ -32,7 +32,7 @@ async function isAdmin(req, res, next) {
   }
 }
 
-async function isAlumno(req, res, next) {
+async function isUser(req, res, next) {
   try {
     const user = await User.findOne({ email: req.email });
     const roles = await Role.find({ _id: { $in: user.roles } });
@@ -49,8 +49,8 @@ async function isAlumno(req, res, next) {
       "Se requiere un rol de Alumno para realizar esta acción",
     );
   } catch (error) {
-    handleError(error, "authorization.middleware -> isAlumno");
+    handleError(error, "authorization.middleware -> isUser");
   }
 }
 
-export { isAdmin, isAlumno};
+export { isAdmin, isUser};

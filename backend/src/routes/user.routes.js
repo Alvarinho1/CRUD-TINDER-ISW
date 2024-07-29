@@ -2,7 +2,7 @@
 
 import { Router } from "express";
 import userController from "../controllers/user.controller.js";
-import { isAdmin, isAlumno } from "../middlewares/authorization.middleware.js";
+import { isAdmin, isUser } from "../middlewares/authorization.middleware.js";
 import authenticationMiddleware from "../middlewares/authentication.middleware.js";
 import upload from "../config/multerConfig.js"; // Si necesitas este middleware para subir fotos de perfil
 
@@ -16,14 +16,15 @@ router.post("/", isAdmin, upload.single('fotoPerfil'), userController.createUser
 router.get("/:rut", isAdmin, userController.getUserByRut);
 router.put("/:rut",  userController.updateUser);
 router.delete("/:rut", isAdmin, userController.deleteUser);
+router.get("/email/:email", isAdmin, userController.getUserByEmail);
 
 // Funciones adicionales
-router.post("/like", isAlumno, userController.likeUser);
-router.post("/dislike", isAlumno, userController.dislikeUser);
+router.post("/like", isUser, userController.likeUser);
+router.post("/dislike", isUser, userController.dislikeUser);
 router.delete("/alumno/removelike",  userController.removeLikeUser);
 router.delete("/alumno/removedislike", userController.removeDislikeUser);
 
-router.post("/alumno/destacarperfil", isAlumno, userController.destacarPerfilUser);
-router.delete("/alumno/quitardestacado", isAlumno, userController.quitarDestacadoPerfilUser);
+router.post("/alumno/destacarperfil", isUser, userController.destacarPerfilUser);
+router.delete("/alumno/quitardestacado", isUser, userController.quitarDestacadoPerfilUser);
 
 export default router;

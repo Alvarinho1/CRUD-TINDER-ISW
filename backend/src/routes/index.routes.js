@@ -16,7 +16,7 @@ import matchRoutes from "./match.routes.js";
 /** Middleware de autenticación */
 import authenticationMiddleware from "../middlewares/authentication.middleware.js";
 import rutaBusqueda from "./busqueda.routes.js";
-
+import chatRoutes from "./chat.routes.js";
 
 /** Instancia del enrutador */
 const router = Router();
@@ -30,6 +30,6 @@ router.use("/auth", authRoutes);
 router.use("/busqueda", authenticationMiddleware, rutaBusqueda);
 
 router.use("/match", authenticationMiddleware, matchRoutes);
-
+router.use("/chat", authenticationMiddleware, chatRoutes);
 // Exporta el enrutador
 export default router;

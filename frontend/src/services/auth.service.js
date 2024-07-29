@@ -1,3 +1,4 @@
+/* eslint-disable no-debugger */
 import axios from './root.service.js';
 import cookies from 'js-cookie';
 
@@ -6,8 +7,9 @@ export async function login(data) {
         const response = await axios.post('/auth/login', data);
         const {status} = response;
         if(status === 200) {
-            sessionStorage.setItem('usuario', JSON.stringify(response.data));
+            sessionStorage.setItem('usuario', JSON.stringify(response.data.data.dataUser));
         }
+    
         return response.data;
     } catch (error) {
         throw error.response?.data || error.message;

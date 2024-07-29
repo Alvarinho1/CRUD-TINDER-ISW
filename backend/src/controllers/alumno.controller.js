@@ -130,7 +130,7 @@ async function removeLikeAlumno(req, res) {
   try {
     const { alumnoId, likedAlumnoId } = req.body;
     const [alumno, error] = await AlumnoService.removeLikeAlumno(alumnoId, likedAlumnoId);
-
+  
     if (error) return respondError(req, res, 400, error);
 
     respondSuccess(req, res, 200, alumno);
