@@ -13,8 +13,8 @@ router.post("/buscarPorCategoria", BusquedaController.BuscarPorCategoria);
 
 router.get("/likes", isAdmin, BusquedaController.BuscarLikesUser);
 router.get("/dislikes", isAdmin, BusquedaController.BuscarDislikesUser);
-router.get("/alumno/likes/:rut", BusquedaController.BuscarLikesUserByRut);
-router.get("/alumno/dislikes/:rut", BusquedaController.BuscarDislikesUserByRut);
+router.get("/alumno/likes/:rut", isUser,BusquedaController.BuscarLikesUserByRut);
+router.get("/alumno/dislikes/:rut", isUser, BusquedaController.BuscarDislikesUserByRut);
 router.get("/alumno/ranking", isAdmin, BusquedaController.RankingUsers);
 
 export default router;

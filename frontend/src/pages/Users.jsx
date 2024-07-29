@@ -17,7 +17,7 @@ const Users = () => {
       const response = await getUsers();
      
       const formattedData = response.data.map(user => ({
-        Nombre: user.username,
+        Nombre: user.nombre,
         Rut: user.rut,
         Correo: user.email,
         Rol: user.roles[0].name

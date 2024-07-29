@@ -26,21 +26,42 @@ const Navbar = () => {
                         alt="Logo tinder"
                     />
                 </li>
+                {userRole == 'user' && (
                 <li className={location.pathname === "/inicio" ? "active" : ""}>
                     <NavLink to="/home">Inicio</NavLink>
                 </li>
+                )}
+
+                {userRole === 'admin' && (
+                    <li className={location.pathname === "/users" ? "active" : ""}>
+                        <NavLink to="/users">Inicio</NavLink>
+                    </li>
+                )}
+
                 <li className={location.pathname === "/chat" ? "active" : ""}>
                     <NavLink to="/chat">Chat</NavLink>
                 </li>
-                {userRole === 'admin' && (
-                    <li className={location.pathname === "/users" ? "active" : ""}>
-                        <NavLink to="/users">Usuarios</NavLink>
-                    </li>
-                )}
+
                 <li className={location.pathname === "/perfil" ? "active" : ""}>
                     <NavLink to="/profile">Perfil</NavLink>
                 </li>
+                {userRole === 'admin' && (
+                    <li className={location.pathname === "/ranking" ? "active" : ""}>
+                        <NavLink to="/ranking">Ranking</NavLink>
+                    </li>              
+                    
+                )}
+                    {userRole === 'admin' && (
+                    <li className={location.pathname === "/likes" ? "active" : ""}>
+                        <NavLink to="/likes">Ver Likes alumnos</NavLink>
+                    </li>  
+                )}   
 
+                    {userRole === 'user' && (
+                    <li className={location.pathname === "/likesrut" ? "active" : ""}>
+                        <NavLink to="/likesrut">Likes Recibidos</NavLink>
+                    </li>  
+                )}  
 
                 <li className={location.pathname === "/" ? "active" : ""}>
                     <NavLink to="/" onClick={logoutSubmit}>Cerrar</NavLink>

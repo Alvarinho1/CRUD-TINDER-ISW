@@ -7,6 +7,9 @@ import Error404 from "./pages/Error404";
 import EditUser from "./pages/EditUser";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Users from "./pages/Users";
+import BusquedaRanking from "./pages/BusquedaRanking";
+import BusquedaLikesUser from "./pages/BusquedaLikesUser";
+import BusquedaLikesRut from "./pages/BusquedaLikesRut";
 
 const AppRouter = () => {
   return (
@@ -44,6 +47,32 @@ const AppRouter = () => {
         element={
           <ProtectedRoute>
             <EditUser />
+          </ProtectedRoute>
+        } 
+      />
+      
+      <Route 
+        path="/ranking" 
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <BusquedaRanking />
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/likes" 
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <BusquedaLikesUser />
+          </ProtectedRoute>
+        } 
+      />
+            <Route 
+        path="/likesrut" 
+        element={
+          <ProtectedRoute allowedRoles={['user']}>
+            <BusquedaLikesRut />
           </ProtectedRoute>
         } 
       />

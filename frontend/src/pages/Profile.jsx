@@ -1,55 +1,32 @@
-import React, { useState, useEffect } from "react";
-import Form from "../components/Form";
+import React from "react";
+import FormEdit from "../components/Form";
 import Navbar from "../components/Navbar";
-import { profile } from "../services/auth.service";
-import { updateUserProfile } from "../services/user.service";
+import { updateUser } from "../services/user.service";
+import { useLocation, useNavigate } from "react-router-dom";
 
-const Profile = () => {
-  const [userProfile, setUserProfile] = useState({
-    nombre: '',
-    apellidos: '',
-    email: '',
-    descripcion: '',
-    areasDeInteres: [], // Inicializar como array
-    cursos: [], // Inicializar como array
-    carrera: ''
-  });
+const EditUser = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { userProfile } = location.state; // Asumiendo que los datos del usuario vienen de location.state como userProfile
 
-  useEffect(() => {
-    async function fetchDataProfile() {
-      try {
-        const { data } = await profile();
-        setUserProfile({
-          ...data,
-          areasDeInteres: Array.isArray(data.areasDeInteres) ? data.areasDeInteres : [], // Verificar si es un array
-          cursos: Array.isArray(data.cursos) ? data.cursos : [] // Verificar si es un array
-        });
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-      }
-    }
-    fetchDataProfile();
-  }, []);
-
-  const handleSubmit = async (formData) => {
-    try {
-      await updateUserProfile(formData);
-      alert("Perfil actualizado correctamente");
-    } catch (error) {
-      console.error("Error updating profile:", error);
-    }
+  const modUser = (data) => {
+    updateUser(data, userProfile.email)
+      .then(response => {
+        console.log("User updated successfully:", response);
+        navigate('/users');
+      })
+      .catch(error => {
+        console.error("Error updating user:", error);
+      });
   };
 
   return (
-    <main className="profile_page">
+    <>
       <Navbar />
-      <div className="sections">
-        <img className="profile_image" src="profile.png" alt="Imagen de perfil" />
-        <div className="form">
-          <Form
-            onSubmit={handleSubmit}
-            backgroundColor="#FFFFFF"
-            title="Perfil"
+      <div className="form-container">
+        <div className="form-wrapper">
+          <FormEdit
+            title="Editar usuario"
             fields={[
               {
                 label: "Nombre",
@@ -101,12 +78,13 @@ const Profile = () => {
                 disabled: false,
               },
             ]}
-            buttonText="Guardar Cambios"
+            buttonText="Guardar cambios"
+            onSubmit={modUser}
           />
         </div>
       </div>
-    </main>
+    </>
   );
 };
 
-export default Profile;
+export default EditUser;
