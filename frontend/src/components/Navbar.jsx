@@ -29,10 +29,14 @@ const Navbar = () => {
                 <li className={location.pathname === "/inicio" ? "active" : ""}>
                     <NavLink to="/home">Inicio</NavLink>
                 </li>
+<<<<<<< HEAD
                 <li className={location.pathname === "/chat" ? "active" : ""}>
                     <NavLink to="/chat">Chat</NavLink>
                 </li>
                 {userRole === 'administrador' && (
+=======
+                { (
+>>>>>>> 6fa55215680c616a218569a88920b7fc5c0369d0
                     <li className={location.pathname === "/usuarios" ? "active" : ""}>
                         <NavLink to="/users">Usuarios</NavLink>
                     </li>
@@ -40,6 +44,8 @@ const Navbar = () => {
                 <li className={location.pathname === "/perfil" ? "active" : ""}>
                     <NavLink to="/profile">Perfil</NavLink>
                 </li>
+
+                
                 <li className={location.pathname === "/" ? "active" : ""}>
                     <NavLink to="/" onClick={logoutSubmit}>Cerrar</NavLink>
                 </li>

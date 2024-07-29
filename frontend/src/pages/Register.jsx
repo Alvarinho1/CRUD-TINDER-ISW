@@ -170,6 +170,14 @@ const Register = () => {
                         type: "text",
                         required: false,
                     },
+                    {
+                        label: "Foto de perfil", // Agrega el campo para la foto de perfil
+                        name: "fotoPerfil",
+                        type: "file",
+                        required: false,
+                    },
+                    
+                    
                 ]}
                 buttonText="Registrarse"
                 onSubmit={registerSubmit}
