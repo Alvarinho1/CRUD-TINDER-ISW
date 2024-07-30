@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Form from "../components/Form";
 import Navbar from "../components/Navbar";
 import { profile } from "../services/auth.service";

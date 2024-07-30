@@ -27,10 +27,10 @@ async function getMatch(req, res) {
     }
 }
 
-async function getMatchesByUserId(req, res) {
+async function getMatchesByMail(req, res) {
     try {
-      const { id } = req.params;
-      const [matches, error] = await MatchService.getMatchesByUserId(id);
+      const { email } = req.params;
+      const [matches, error] = await MatchService.getMatchesByMail(email);
   
       if (error) return respondError(req, res, 404, error);
   
@@ -41,6 +41,21 @@ async function getMatchesByUserId(req, res) {
       respondError(req, res, 500, "Error interno del servidor");
     }
   }
+  async function getMatchesByEmail(req, res) {
+    try {
+      const { id } = req.params;
+      const [matches, error] = await MatchService.getMatchesByEmail(id);
+  
+      if (error) return respondError(req, res, 404, error);
+  
+      matches.length === 0
+        ? respondSuccess(req, res, 204, "No hay matches para este usuario")
+        : respondSuccess(req, res, 200, matches);
+    } catch (error) {
+      respondError(req, res, 500, "Error interno del servidor");
+    }
+  }
+  
 
   
   async function deleteMatchById(req, res) {
@@ -100,7 +115,7 @@ async function getMatchesByUserId(req, res) {
 export default {
     getMatches,
     getMatch,
-    getMatchesByUserId,
+    getMatchesByMail,
     deleteMatchById,
     disableMatchesByUserId,
     enableMatchesByUserId

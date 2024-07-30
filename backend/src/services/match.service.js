@@ -1,4 +1,5 @@
 import Match from "../models/match.model.js";
+import UserService from "../services/user.service.js";
 import { handleError } from "../utils/errorHandler.js";
 
 async function getMatches() {
@@ -39,7 +40,34 @@ async function getMatchById(id) {
   }
 }
 
-async function getMatchesByUserId(id) {
+async function getMatchesByMail(email) {
+  try {
+    // Buscar todos los matches donde el ID sea igual a userId o matchUserId.
+    var listOfUsers = []
+    const [user] = await UserService.getUserByEmail(email);
+    const userId = user._id;
+    const matches = await Match.find({ $or: [{ userId }, { matchUserId: userId }] }).exec();
+    
+    // Verificar si se encontraron matches.
+    if (matches.length === 0) {
+      return [null, "No hay matches para este alumno"];
+    }
+
+    for(let item of matches) {
+      const userInfo = await UserService.getUserById(item.userId)
+      if(userInfo) listOfUsers.push(userInfo)
+    }
+      console.log(" DATA RECEIVED" + JSON.stringify(listOfUsers))
+
+    // Devolver los matches encontrados.
+    return [listOfUsers, null];
+  } catch (error) {
+    // Manejar errores y devolver mensaje de error.
+    handleError(error, "match.service -> getMatchesByMail");
+    return [null, "Error al obtener los matches"];
+  }
+}
+async function getMatchesByEmail(email) {
   try {
     // Buscar todos los matches donde el ID sea igual a userId o matchUserId.
     const matches = await Match.find({ $or: [{ userId: id }, { matchUserId: id }] }).exec();
@@ -57,6 +85,7 @@ async function getMatchesByUserId(id) {
     return [null, "Error al obtener los matches"];
   }
 }
+
 
 async function createMatch(userId, matchUserId) {
   try {
@@ -128,9 +157,9 @@ async function enableMatchesByUserId(userId) {
 export default {
   getMatches,
   getMatchById,
-  getMatchesByUserId,
   createMatch,
   deleteMatchById,
   disableMatchesByUserId,
-  enableMatchesByUserId
+  enableMatchesByUserId,
+  getMatchesByMail
 };

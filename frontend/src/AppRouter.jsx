@@ -7,6 +7,7 @@ import Error404 from './pages/Error404';
 import EditUser from './pages/EditUser';
 import ProtectedRoute from './components/ProtectedRoute';
 import Users from './pages/Users';
+import Chat from './pages/Chat';
 
 
 const AppRouter = () => {
@@ -24,6 +25,16 @@ const AppRouter = () => {
           </ProtectedRoute>
         } 
       />
+
+      <Route
+        path="/chat"
+        element={
+          <ProtectedRoute>
+            <Chat />
+          </ProtectedRoute>
+        }
+      />
+
       <Route 
         path="/users" 
         element={

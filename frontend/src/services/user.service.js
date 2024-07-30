@@ -20,6 +20,27 @@ export async function getUsers() {
         throw error.response?.data || error.message;
     }
 }
+export async function getUsersAndMessages() {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+        if (!token) {
+            throw new Error('No hay token disponible');
+        }
+
+        const config = {
+            headers: {
+                'Cache-Control': 'no-cache',
+                'Authorization': `Bearer ${token.replace(/"/g, '')}` // Elimina las comillas adicionales si están presentes
+            }
+        };
+
+        const { data } = await axios.get('/users/', config);
+        return data;
+    } catch (error) {
+        throw error.response?.data || error.message;
+    }
+}
+
 
 
 
