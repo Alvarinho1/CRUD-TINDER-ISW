@@ -97,6 +97,27 @@ async function RankingUsers(req, res) {
     }
 }
 
+async function BuscarLikesDados(req, res) {
+    try {
+        const { rut } = req.params;
+        const [likedUsers, error] = await BusquedaServicio.BuscarLikesDados(rut);
+
+        if (error) {
+            return respondError(req, res, 400, error);
+        }
+
+        if (!likedUsers || likedUsers.length === 0) {
+            return respondError(req, res, 400, "No se encontraron usuarios a los cuales se les ha dado like");
+        }
+
+        respondSuccess(req, res, 200, likedUsers);
+    } catch (error) {
+        handleError(error, "busqueda.controller -> BuscarLikesDados");
+        respondError(req, res, 500, "Error interno del servidor");
+    }
+}
+
+
 export default {
     BuscarDisponibles,
     BuscarPorCategoria,
@@ -104,5 +125,6 @@ export default {
     BuscarDislikesUser,
     BuscarLikesUserByRut,
     BuscarDislikesUserByRut,
-    RankingUsers
+    RankingUsers,
+    BuscarLikesDados
 };

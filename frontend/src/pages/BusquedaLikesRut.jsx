@@ -30,12 +30,14 @@ const BusquedaLikesRut = () => {
     return (
         <div>
             <Navbar />
-            <h1>Likes del Usuario</h1>
+             <h1>Likes del Alumno</h1>
             {error ? (
                 <div>Error: {error}</div>
             ) : (
                 <table>
+                     
                     <thead>
+                  
                         <tr>
                             <th>Nombre</th>
                             <th>Apellidos</th>

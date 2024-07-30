@@ -1,9 +1,12 @@
 import React from 'react';
 import Swal from 'sweetalert2';
+import { MdThumbUp, MdThumbDown } from 'react-icons/md';
+import TinderCard from 'react-tinder-card';
 import { likeUser, dislikeUser } from '../services/user.service';
 import '../styles/UserCard.css';
 
-const UserCard = ({ user }) => {
+const UserCard = ({ user, swiped, outOfFrame }) => {
+
   const handleLike = async () => {
     try {
       const usuario = JSON.parse(sessionStorage.getItem('usuario'));
@@ -36,6 +39,7 @@ const UserCard = ({ user }) => {
           title: 'Éxito',
           text: 'Like Enviado',
         });
+        swiped('right', user.rut); // Simula el swipe a la derecha
       }
     } catch (error) {
       console.error("Error liking user:", error);
@@ -79,6 +83,7 @@ const UserCard = ({ user }) => {
           title: 'Éxito',
           text: 'Dislike Enviado',
         });
+        swiped('left', user.rut); // Simula el swipe a la izquierda
       }
     } catch (error) {
       console.error("Error disliking user:", error);
@@ -91,23 +96,35 @@ const UserCard = ({ user }) => {
   };
 
   return (
-    <div className="user-card">
-      <div className="user-card-header">
-        <h2>{user.nombre}</h2>
-        <p>{user.genero}</p>
+    <TinderCard
+      className="swipe"
+      onSwipe={(dir) => swiped(dir, user.rut)}
+      onCardLeftScreen={() => outOfFrame(user.rut)}
+      preventSwipe={['up', 'down']}
+    >
+      <div className="user-card">
+        <div className="user-card-header">
+          <h2>{user.nombre}</h2>
+          <p>{user.apellidos}</p>
+        </div>
+        <div className="user-card-body">
+          <p><strong>Genero:</strong> {user.genero}</p>
+          <p><strong>Carrera:</strong> {user.carrera}</p>
+          <p><strong>Descripción:</strong> {user.descripcion || 'N/A'}</p>
+          <p><strong>Áreas de Interés:</strong> {Array.isArray(user.areasDeInteres) ? user.areasDeInteres.join(', ') : user.areasDeInteres}</p>
+          <p><strong>Cursos:</strong> {Array.isArray(user.cursos) ? user.cursos.join(', ') : user.cursos}</p>
+        </div>
+        <div className="user-card-footer">
+          <button onClick={handleLike}>
+            <MdThumbUp style={{ marginRight: '10px' }} /> Like
+          </button>
+          <button onClick={handleDislike}>
+            <MdThumbDown style={{ marginRight: '10px' }} /> Dislike
+          </button>
+        </div>
       </div>
-      <div className="user-card-body">
-        <p><strong>Carrera:</strong> {user.carrera}</p>
-        <p><strong>Descripción:</strong> {user.descripcion || 'N/A'}</p>
-        <p><strong>Áreas de Interés:</strong> {user.areasDeInteres.join(', ')}</p>
-        <p><strong>Cursos:</strong> {user.cursos.join(', ')}</p>
-      </div>
-      <div className="user-card-footer">
-        <button onClick={handleLike}>Like</button>
-        <button onClick={handleDislike}>Dislike</button>
-      </div>
-    </div>
+    </TinderCard>
   );
-}
+};
 
 export default UserCard;

@@ -454,10 +454,10 @@ table {
 
   .main-container {
 	padding: 20px;
-	margin-top: 14vh; /* Ajusta este valor según la altura de tu navbar */
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	min-height: 100vh; /* Asegúrate de que el contenedor ocupe toda la altura de la ventana */
   }
   
   .title {
@@ -465,9 +465,93 @@ table {
 	margin-bottom: 20px;
   }
   
-  .user-cards-container {
+  .tinder-cards-container {
+	width: 100vw;
+	max-width: 700px; /* Ajusta el ancho máximo según tus necesidades */
+	height: 80vh;
 	display: flex;
-	flex-wrap: wrap;
 	justify-content: center;
-	gap: 25px; 
+	align-items: center; /* Asegúrate de que las tarjetas estén centradas verticalmente */
+	margin-top: 20px;
+	position: relative;
+  }
+  
+  .user-card {
+	position: absolute;
+	width: 100%;
+	max-width: 800px; /* Ajusta el ancho máximo según tus necesidades */
+	height: 80vh;
+	border-radius: 10px;
+	background-color: white;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	transition: transform 0.3s ease; /* Añadir una transición para el efecto de deslizamiento */
+  }
+  
+  .user-card-header {
+	background-color: #f4f4f4;
+	padding: 20px; /* Ajusta el padding según tus necesidades */
+	width: 100%;
+	text-align: center;
+  }
+  
+  .user-card-header h2 {
+	margin: 0;
+	font-size: 32px; /* Aumenta el tamaño de la fuente */
+	font-weight: bold; /* Ajusta el peso de la fuente */
+  }
+  
+  .user-card-header p {
+	margin: 5px 0 0;
+	font-size: 24px; /* Aumenta el tamaño de la fuente */
+	color: #777;
+  }
+  
+  .user-card-body {
+	padding: 20px; /* Ajusta el padding según tus necesidades */
+	width: 100%;
+	text-align: left;
+  }
+  
+  .user-card-body p {
+	margin: 10px 0;
+	font-size: 20px; /* Aumenta el tamaño de la fuente */
+  }
+  
+  .user-card-body p strong {
+	color: #333;
+	font-size: 20px; /* Aumenta el tamaño de la fuente */
+  }
+
+  .user-card-footer {
+	display: flex;
+	justify-content: space-around;
+	width: 100%;
+	padding: 20px;
+  }
+  
+  .user-card-footer button {
+	background-color: #ff6666;
+	color: rgb(11, 11, 11);
+	border: none;
+	border-radius: 50%;
+	padding: 35px 35px;
+	font-size: 22px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+  }
+  
+  .user-card-footer button:hover {
+	background-color: #ff4d4d;
+  }
+  
+  .user-card-footer button .icon {
+	margin-right: 10px;
   }

@@ -1,0 +1,59 @@
+/* BusquedaLikesDados.css */
+
+body {
+    font-family: 'Arial', sans-serif; /* Fuente más moderna y legible */
+    background-color: #f9f9f9; /* Color de fondo suave para toda la página */
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center; /* Centra verticalmente */
+    height: 100vh; /* Ocupa el 100% de la altura de la ventana */
+    padding: 20px;
+}
+
+.table-wrapper {
+    width: 100%;
+    max-width: 800px; /* Ancho máximo de la tabla */
+    background-color: #fff; /* Fondo blanco para la tabla */
+    border-radius: 8px; /* Bordes redondeados para la tabla */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil para la tabla */
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #333; /* Color del texto del título */
+    margin-bottom: 20px; /* Espacio entre el título y la tabla */
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #007bff; /* Color de fondo de las cabeceras */
+    color: #000; /* Color del texto de las cabeceras (negro) */
+}
+
+td {
+    background-color: #f4f4f4; /* Color de fondo de las celdas */
+}
+
+tr:nth-child(even) td {
+    background-color: #e9ecef; /* Color de fondo alternativo para filas pares */
+}
+
+tr:hover td {
+    background-color: #e0e0e0; /* Color de fondo al pasar el ratón */
+}

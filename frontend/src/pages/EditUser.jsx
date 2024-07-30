@@ -1,62 +1,72 @@
-import React from "react";
 import Form from "../components/Form";
 import Navbar from "../components/Navbar";
-import { updateUser } from "../services/user.service";
-import { useLocation, useNavigate } from "react-router-dom";
+import { profile } from "../services/auth.service";
+import { useState, useEffect } from "react";
 
-const EditUser = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { user } = location.state;
+const Profile = () => {
+  const [userProfile, setUserProfile] = useState({
+    username: '',
+    email: '',
+    rut: '',
+    rolName: ''
+  });
 
-  const modUser = (data) => {
-    updateUser(data, user.email)  // Usar el correo electrónico en lugar del RUT
-      .then(response => {
-        console.log("User updated successfully:", response);
-        navigate('/users');
-      })
-      .catch(error => {
-        console.error("Error updating user:", error);
-      });
-  };
+  useEffect(() => {
+    async function dataProfile(){  
+      try {
+        const { data } = await profile();
+        setUserProfile(data);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    }
+    dataProfile();
+  }, []);
 
   return (
-    <>
+    <main className="profile_page">
       <Navbar />
-      <div className="form-container">
-        <div className="form-wrapper">
-          <Form
-            title="Editar usuario"
-            fields={[
-              {
-                label: "Nombre de usuario",
-                name: "nombre",
-                placeholder: user.nombre || "Didudo",
-                type: "text",
-                value: user.nombre,
-              },
-              {
-                label: "Correo electrónico",
-                name: "email",
-                placeholder: user.email || "example@gmail.com",
-                type: "email",
-                value: user.email,
-              },
-              {
-                label: "Nombre de rol",
-                name: "rol",
-                placeholder: user.rol || "user",
-                type: "text",
-                value: user.rol,
-              },
-            ]}
-            buttonText="Guardar cambios"
-            onSubmit={modUser}
-          />
+      <div className="sections">
+        <img className="profile_image" src="profile.png" alt="Imagen de perfil" />
+        <div className="form">
+        <Form
+          backgroundColor="#FFFFFF"
+          title="Perfil"
+          fields={[
+            {
+              label: "Nombre de usuario",
+              name: "username",
+              type: "text",
+              value: userProfile.username,
+              disabled: true,
+            },
+            {
+              label: "Correo electrónico",
+              name: "email",
+              type: "email",
+              value: userProfile.email,
+              disabled: true,
+            },
+            {
+              label: "RUT",
+              name: "rut",
+              type: "text",
+              value: userProfile.rut,
+              disabled: true,
+            },
+            {
+              label: "Rol",
+              name: "role",
+              type: "text",
+              value: userProfile.rolName,
+              disabled: true,
+            },
+          ]}
+        />
         </div>
       </div>
-    </>
+    </main>
   );
 };
 
-export default EditUser;
+export default Profile;

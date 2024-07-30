@@ -10,6 +10,7 @@ import Users from "./pages/Users";
 import BusquedaRanking from "./pages/BusquedaRanking";
 import BusquedaLikesUser from "./pages/BusquedaLikesUser";
 import BusquedaLikesRut from "./pages/BusquedaLikesRut";
+import BusquedaLikesDados from "./pages/BusquedaLikesDados";
 
 const AppRouter = () => {
   return (
@@ -68,11 +69,21 @@ const AppRouter = () => {
           </ProtectedRoute>
         } 
       />
-            <Route 
+      
+      <Route 
         path="/likesrut" 
         element={
           <ProtectedRoute allowedRoles={['user']}>
             <BusquedaLikesRut />
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/likesdados" 
+        element={
+          <ProtectedRoute allowedRoles={['user']}>
+            <BusquedaLikesDados />
           </ProtectedRoute>
         } 
       />

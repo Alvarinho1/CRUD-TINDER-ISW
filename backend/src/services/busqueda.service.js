@@ -92,6 +92,7 @@ async function BuscarLikesUser() {
     }
 }
 
+
 async function BuscarDislikesUser() {
     try {
         const user = await User.find(
@@ -168,6 +169,37 @@ async function RankingUsers() {
     }
 }
 
+async function BuscarLikesDados(rut) {
+    try {
+        // Buscar al usuario por su rut
+        const user = await User.findOne({ rut });
+
+        if (!user) {
+            return [null, "El usuario no existe"];
+        }
+
+        // Verificar si el usuario tiene likes dados
+        if (!user.likes || user.likes.length === 0) {
+            return [null, "El usuario no ha dado likes a ningún otro usuario"];
+        }
+
+        // Obtener los IDs de los usuarios a los cuales se les ha dado like
+        const userIds = user.likes.map(like => like.userId);
+
+        // Buscar los usuarios correspondientes a los IDs obtenidos
+        const likedUsers = await User.find({ _id: { $in: userIds } }, { nombre: 1, apellidos: 1, rut: 1 });
+
+        if (!likedUsers || likedUsers.length === 0) {
+            return [null, "No se encontraron usuarios a los cuales se les ha dado like"];
+        }
+
+        return [likedUsers, null];
+    } catch (error) {
+        handleError(error, "busqueda.service -> BuscarLikesDados");
+        return [null, error.message];
+    }
+}
+
 export default {
     BuscarDisponibles,
     BuscarPorCategoria,
@@ -175,5 +207,6 @@ export default {
     BuscarDislikesUser,
     BuscarLikesUserByRut,
     BuscarDislikesUserByRut,
-    RankingUsers
+    RankingUsers,
+    BuscarLikesDados
 };
