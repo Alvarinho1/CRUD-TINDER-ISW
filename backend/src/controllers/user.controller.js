@@ -9,7 +9,8 @@ import MatchService from "../services/match.service.js";
 // Obtener todos los usuarios
 async function getUsers(req, res) {
   try {
-    const [users, error] = await UserService.getUsers();
+    const excludeUserId = req.query.exclude;
+    const [users, error] = await UserService.getUsers(excludeUserId);
     if (error) return respondError(req, res, 404, error);
 
     users.length === 0
@@ -19,6 +20,7 @@ async function getUsers(req, res) {
     respondError(req, res, 500, "Error interno del servidor");
   }
 }
+
 
 // Crear un nuevo usuario
 async function createUser(req, res) {

@@ -3,9 +3,9 @@ import Role from "../models/role.model.js";
 import { handleError } from "../utils/errorHandler.js";
 
 
-async function getUsers() {
+async function getUsers(excludeUserId) {
   try {
-    const users = await User.find().populate('roles').exec();
+    const users = await User.find({ _id: { $ne: excludeUserId } }).populate('roles').exec();
     if (!users) return [null, "No hay usuarios"];
     return [users, null];
   } catch (error) {
@@ -13,7 +13,6 @@ async function getUsers() {
     return [null, "Error al obtener los usuarios"];
   }
 }
-
 async function createUser(user) {
   try {
     const { nombre, apellidos, genero, rut, email, carrera, cursos, areasDeInteres, fotoPerfil, password, roles } = user;
@@ -97,7 +96,7 @@ async function updateUser(rut, user) {
     if (!userFound) return [null, "El usuario no existe"];
 
     // Extraer campos del usuario, incluyendo roles
-    const { nombre, apellidos, genero, email, carrera, cursos, areasDeInteres, fotoPerfil, roles } = user;
+    const { nombre, apellidos, genero, email, carrera, cursos, areasDeInteres, fotoPerfil, descripcion, roles } = user;
 
     // Si se proporcionan roles, validar su existencia
     let roleIds = userFound.roles; // Mantener roles existentes por defecto
@@ -119,6 +118,7 @@ async function updateUser(rut, user) {
         cursos,
         areasDeInteres,
         fotoPerfil,
+        descripcion,
         roles: roleIds, // Asignar roles actualizados
       },
       { new: true },

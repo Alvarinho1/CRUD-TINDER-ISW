@@ -45,17 +45,21 @@ async function getMatchesByUserId(req, res) {
   
   async function deleteMatchById(req, res) {
     try {
-      const { id } = req.params;
-      const [result, error] = await MatchService.deleteMatchById(id);
+      const { id } = req.params; // Obtén el ID del match desde los parámetros de la URL
+      const [result, error] = await MatchService.deleteMatchById(id); // Llama al servicio para eliminar el match
   
-      if (error) return respondError(req, res, 404, error);
+      if (error) {
+        // Si hay un error al eliminar el match, responde con un estado 404
+        return respondError(req, res, 404, error);
+      }
   
+      // Si todo salió bien, responde con el resultado y un estado 200
       respondSuccess(req, res, 200, result);
     } catch (error) {
+      // Maneja cualquier error inesperado
       respondError(req, res, 500, "Error interno del servidor");
     }
   }
-
 
   async function disableMatchesByUserId(req, res) {
     try {

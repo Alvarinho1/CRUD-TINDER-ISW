@@ -79,6 +79,8 @@ const userSchema = new mongoose.Schema(
     },
     cursos: [String],
     areasDeInteres: [String],
+    descripcion: [String],
+    
     likes: [{
       type: mongoose.Schema.Types.Mixed,
       ref: "User"
@@ -91,6 +93,7 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.Mixed,
       ref: "User"
     },
+
     fotoPerfil: {
       type: String // Campo para almacenar la ruta de la foto de perfil
     },
@@ -98,12 +101,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true
     },
+
     roles: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Role"
       }
-    ]
+    ],
+
   },
   {
     versionKey: false

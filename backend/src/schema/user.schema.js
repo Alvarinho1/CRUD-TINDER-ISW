@@ -1,5 +1,3 @@
-"use strict";
-
 import Joi from "joi";
 import ROLES from "../constants/roles.constants.js";
 
@@ -103,10 +101,14 @@ const userSchema = Joi.object({
       "string.base": "El rol debe ser de tipo string.",
       "any.only": "El rol proporcionado no es válido.",
     }),
-      fotoPerfil: Joi.any().optional().messages({
+  fotoPerfil: Joi.any().optional().messages({
     "any.optional": "La foto de perfil es opcional."
+  }),
+  descripcion: Joi.string().max(120).optional().allow('').messages({
+    "string.base": "La descripción debe ser de tipo string.",
+    "string.max": "La descripción no puede tener más de 120 caracteres.",
+    "any.optional": "La descripción es opcional.",
   })
-    
 }).messages({
   "object.unknown": "No se permiten propiedades adicionales.",
 });

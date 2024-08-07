@@ -107,7 +107,7 @@ async function refresh(cookies) {
 
 async function register(user) {
   try {
-    const { nombre, apellidos, genero, rut, email, carrera, cursos, areasDeInteres, fotoPerfil, password, roles } = user;
+    const { nombre, apellidos, genero, rut, email, carrera, cursos, areasDeInteres, fotoPerfil, password, roles, descripcion } = user;
 
     // Verifica que los campos obligatorios no estén vacíos
     if (!email || !password || !rut) {
@@ -152,6 +152,7 @@ async function register(user) {
       cursos,
       areasDeInteres,
       fotoPerfil,
+      descripcion, // Agregado aquí
       password: await User.encryptPassword(password),
       roles: roleIds
     });
@@ -177,6 +178,7 @@ async function register(user) {
     return { error: error.message };
   }
 }
+
 
 async function profile(userId) {
   try {
