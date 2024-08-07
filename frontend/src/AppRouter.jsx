@@ -11,6 +11,7 @@ import BusquedaRanking from "./pages/BusquedaRanking";
 import BusquedaLikesUser from "./pages/BusquedaLikesUser";
 import BusquedaLikesRut from "./pages/BusquedaLikesRut";
 import BusquedaLikesDados from "./pages/BusquedaLikesDados";
+import Matches from "./pages/Matches";
 
 const AppRouter = () => {
   return (
@@ -88,6 +89,14 @@ const AppRouter = () => {
         } 
       />
       
+      <Route 
+        path="/matches" 
+        element={
+          <ProtectedRoute allowedRoles={['user']}>
+            <Matches />
+          </ProtectedRoute>
+        } 
+      />
       <Route path="*" element={<Error404 />} />
     </Routes>
   );

@@ -34,18 +34,26 @@ export async function register(data) {
 
 export async function profile() {
     try {
+        const token = sessionStorage.getItem('accessToken');
+        const usuario = JSON.parse(sessionStorage.getItem('usuario'));
+
+        if (!token || !usuario || !usuario.rut) {
+            throw new Error('No hay token disponible o usuario no encontrado');
+        }
+
         const config = {
             headers: {
-                'Cache-Control': 'no-cache'
+                'Cache-Control': 'no-cache',
+                'Authorization': `Bearer ${token.replace(/"/g, '')}`
             }
-        }
-        const data = await axios.get('/auth/profile', config)
+        };
+
+        const { data } = await axios.get(`/users/${usuario.rut}`, config);
         return data;
     } catch (error) {
         throw error.response?.data || error.message;
     }
 }
-
 export async function logout() {
     try {
         await axios.post('/auth/logout');
@@ -53,5 +61,28 @@ export async function logout() {
         cookies.remove('miCookie');
     } catch (error) {
         console.error('Error al cerrar sesión:', error);
+    }
+}
+
+export async function updateUserProfile(data) {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+        const usuario = JSON.parse(sessionStorage.getItem('usuario'));
+
+        if (!token || !usuario || !usuario.rut) {
+            throw new Error('No hay token disponible o usuario no encontrado');
+        }
+
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Cache-Control': 'no-cache'
+            }
+        };
+
+        const response = await axios.put(`/users/${usuario.rut}`, data, config);
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || error.message;
     }
 }

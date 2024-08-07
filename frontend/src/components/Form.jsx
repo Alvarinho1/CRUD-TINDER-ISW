@@ -2,24 +2,27 @@ import { useState, useEffect } from 'react';
 
 const Form = ({ title, fields, buttonText, onSubmit, footerContent, backgroundColor }) => {
     const initialFormData = fields.reduce((acc, field) => {
-        acc[field.name] = '';
+        acc[field.name] = field.value || '';
         return acc;
     }, {});
 
     const [formData, setFormData] = useState(initialFormData);
 
     useEffect(() => {
-        setFormData(initialFormData);
+        const newFormData = fields.reduce((acc, field) => {
+            acc[field.name] = field.value || '';
+            return acc;
+        }, {});
+        setFormData(newFormData);
     }, [fields]);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
 
-        // Convertir los campos de cursos y áreas de interés a arrays
         if (name === 'cursos' || name === 'areasDeInteres') {
             setFormData({
                 ...formData,
-                [name]: value.split(',').map(item => item.trim()), // Convertir a array manteniendo espacios dentro de cada item
+                [name]: value.split(',').map(item => item.trim()),
             });
         } else {
             setFormData({
@@ -32,7 +35,6 @@ const Form = ({ title, fields, buttonText, onSubmit, footerContent, backgroundCo
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        // Verificar todos los campos requeridos
         const requiredFields = fields.filter(field => field.required);
         for (let field of requiredFields) {
             if (!formData[field.name] || formData[field.name].length === 0) {
@@ -58,6 +60,7 @@ const Form = ({ title, fields, buttonText, onSubmit, footerContent, backgroundCo
                             value={formData[field.name] || ""}
                             onChange={handleChange}
                             required={field.required}
+                            disabled={field.disabled}
                         />
                     ) : field.type === 'select' ? (
                         <select
@@ -65,6 +68,7 @@ const Form = ({ title, fields, buttonText, onSubmit, footerContent, backgroundCo
                             value={formData[field.name] || ""}
                             onChange={handleChange}
                             required={field.required}
+                            disabled={field.disabled}
                         >
                             <option value="" disabled>{field.placeholder || "Selecciona una opción"}</option>
                             {field.options.map((option, i) => (
@@ -79,6 +83,7 @@ const Form = ({ title, fields, buttonText, onSubmit, footerContent, backgroundCo
                             value={formData[field.name] || ""}
                             onChange={handleChange}
                             required={field.required}
+                            disabled={field.disabled}
                         />
                     )}
                 </div>

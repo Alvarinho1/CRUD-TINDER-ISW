@@ -13,7 +13,7 @@ router.use(authenticationMiddleware);
 // Rutas básicas de usuario
 router.get("/", userController.getUsers);
 router.post("/", isAdmin, upload.single('fotoPerfil'), userController.createUser);
-router.get("/:rut", isAdmin, userController.getUserByRut);
+router.get("/:rut", userController.getUserByRut);
 router.put("/:rut",  userController.updateUser);
 router.delete("/:rut", isAdmin, userController.deleteUser);
 router.get("/email/:email", isAdmin, userController.getUserByEmail);

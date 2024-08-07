@@ -1,45 +1,46 @@
-import React from "react";
-import FormEdit from "../components/Form";
-import Navbar from "../components/Navbar";
-import { updateUser } from "../services/user.service";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import Navbar from '../components/Navbar';
+import Form from '../components/Form';
 
-const EditUser = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { userProfile } = location.state; // Asumiendo que los datos del usuario vienen de location.state como userProfile
+const Profile = () => {
+  const [userProfile, setUserProfile] = useState({
+    username: '',
+    email: '',
+    rut: '',
+    rolName: '',
+    descripcion: '',
+    areasDeInteres: [],
+    cursos: [],
+  });
 
-  const modUser = (data) => {
-    updateUser(data, userProfile.email)
-      .then(response => {
-        console.log("User updated successfully:", response);
-        navigate('/users');
-      })
-      .catch(error => {
-        console.error("Error updating user:", error);
-      });
-  };
+  useEffect(() => {
+    async function fetchDataProfile() {
+      try {
+        const response = await getProfile();
+        console.log("Fetched profile: ", response); // Log para verificar los datos
+        setUserProfile(response);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    }
+    fetchDataProfile();
+  }, []);
 
   return (
-    <>
+    <main className="profile_page">
       <Navbar />
-      <div className="form-container">
-        <div className="form-wrapper">
-          <FormEdit
-            title="Editar usuario"
+      <div className="sections">
+        <img className="profile_image" src="profile.png" alt="Imagen de perfil" />
+        <div className="form">
+          <Form
+            backgroundColor="#FFFFFF"
+            title="Perfil"
             fields={[
               {
-                label: "Nombre",
-                name: "nombre",
+                label: "Nombre de usuario",
+                name: "username",
                 type: "text",
-                value: userProfile.nombre,
-                disabled: true,
-              },
-              {
-                label: "Apellidos",
-                name: "apellidos",
-                type: "text",
-                value: userProfile.apellidos,
+                value: userProfile.username,
                 disabled: true,
               },
               {
@@ -50,41 +51,39 @@ const EditUser = () => {
                 disabled: true,
               },
               {
+                label: "RUT",
+                name: "rut",
+                type: "text",
+                value: userProfile.rut,
+                disabled: true,
+              },
+              {
                 label: "Descripción",
                 name: "descripcion",
                 type: "text",
                 value: userProfile.descripcion,
-                disabled: false,
+                disabled: true,
               },
               {
                 label: "Áreas de Interés",
                 name: "areasDeInteres",
                 type: "text",
-                value: Array.isArray(userProfile.areasDeInteres) ? userProfile.areasDeInteres.join(', ') : '', // Verificar si es un array
-                disabled: false,
+                value: userProfile.areasDeInteres.join(', '),
+                disabled: true,
               },
               {
                 label: "Cursos",
                 name: "cursos",
                 type: "text",
-                value: Array.isArray(userProfile.cursos) ? userProfile.cursos.join(', ') : '', // Verificar si es un array
-                disabled: false,
-              },
-              {
-                label: "Carrera",
-                name: "carrera",
-                type: "text",
-                value: userProfile.carrera,
-                disabled: false,
+                value: userProfile.cursos.join(', '),
+                disabled: true,
               },
             ]}
-            buttonText="Guardar cambios"
-            onSubmit={modUser}
           />
         </div>
       </div>
-    </>
+    </main>
   );
 };
 
-export default EditUser;
+export default Profile;

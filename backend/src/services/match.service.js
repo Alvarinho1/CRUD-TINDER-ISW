@@ -42,19 +42,28 @@ async function getMatchById(id) {
 async function getMatchesByUserId(id) {
   try {
     // Buscar todos los matches donde el ID sea igual a userId o matchUserId.
-    const matches = await Match.find({ $or: [{ userId: id }, { matchUserId: id }] }).exec();
+    const matches = await Match.find({ $or: [{ userId: id }, { matchUserId: id }] })
+      .populate('userId', 'nombre apellidos descripcion carrera cursos areasDeInteres')
+      .populate('matchUserId', 'nombre apellidos descripcion carrera cursos areasDeInteres')
+      .exec();
 
     // Verificar si se encontraron matches.
     if (matches.length === 0) {
-      return [null, "No hay matches para este alumno"];
+      return [[], "No hay matches para este alumno"];
     }
 
-    // Devolver los matches encontrados.
-    return [matches, null];
+    // Mapear los matches para obtener solo los usuarios con los que el usuario actual ha hecho match, excluyendo el usuario logueado.
+    const matchedUsers = matches.map(match => {
+      const isUserMatch = match.userId._id.toString() === id;
+      return isUserMatch ? match.matchUserId : match.userId;
+    }).filter(user => user._id.toString() !== id);
+
+    // Devolver los usuarios encontrados.
+    return [matchedUsers, null];
   } catch (error) {
     // Manejar errores y devolver mensaje de error.
-    handleError(error, "match.service -> getMatchesByUserId");
-    return [null, "Error al obtener los matches"];
+    console.error(error);
+    return [[], "Error al obtener los matches"];
   }
 }
 

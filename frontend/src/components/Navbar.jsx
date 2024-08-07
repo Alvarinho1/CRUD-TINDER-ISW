@@ -41,8 +41,8 @@ const Navbar = () => {
                     <NavLink to="/chat">Chat</NavLink>
                 </li>
 
-                <li className={location.pathname === "/perfil" ? "active" : ""}>
-                    <NavLink to="/profile">Perfil</NavLink>
+                <li className={location.pathname === "/edit-user/:rut" ? "active" : ""}>
+                    <NavLink to="/edit-user/:rut">Perfil</NavLink>
                 </li>
                 {userRole === 'admin' && (
                     <li className={location.pathname === "/ranking" ? "active" : ""}>
@@ -67,6 +67,13 @@ const Navbar = () => {
                         <NavLink to="/likesrut">Likes Recibidos</NavLink>
                     </li>  
                 )}  
+
+                    {userRole === 'user' && (
+                    <li className={location.pathname === "/matches" ? "active" : ""}>
+                        <NavLink to="/matches">Matches</NavLink>
+                    </li>  
+                )}  
+
 
 
 
