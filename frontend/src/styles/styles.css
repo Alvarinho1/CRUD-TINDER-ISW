@@ -549,30 +549,48 @@ table th {
 }
 
 .user-card-footer {
-  display: flex;
-  justify-content: space-around;
-  width: 100%;
-  padding: 20px;
-}
-
-.user-card-footer button {
-  background-color: #24f205;
-  color: #1a2e40;
-  border: none;
-  border-radius: 50%;
-  padding: 35px 35px;
-  font-size: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.user-card-footer button:hover {
-  background-color: #04b2d9;
-}
-
-.user-card-footer button .icon {
-  margin-right: 10px;
-}
+	display: flex;
+	justify-content: space-around;
+	width: 100%;
+	padding: 20px;
+  }
+  
+  .like-button {
+	background-color: #24f205;
+	color: #1a2e40;
+	border: none;
+	border-radius: 50%;
+	padding: 35px 35px;
+	font-size: 22px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+  }
+  
+  .like-button:hover {
+	background-color: #04b2d9;
+  }
+  
+  .dislike-button {
+	background-color: #f20505;
+	color: #1a2e40;
+	border: none;
+	border-radius: 50%;
+	padding: 35px 35px;
+	font-size: 22px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+  }
+  
+  .dislike-button:hover {
+	background-color: #d90404;
+  }
+  
+  .icon {
+	margin-right: 10px;
+  }

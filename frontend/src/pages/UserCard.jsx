@@ -115,11 +115,11 @@ const UserCard = ({ user, swiped, outOfFrame }) => {
           <p><strong>Cursos:</strong> {Array.isArray(user.cursos) ? user.cursos.join(', ') : user.cursos}</p>
         </div>
         <div className="user-card-footer">
-          <button onClick={handleLike}>
-            <MdThumbUp style={{ marginRight: '10px' }} /> Like
-          </button>
-          <button onClick={handleDislike}>
+          <button className="dislike-button" onClick={handleDislike}>
             <MdThumbDown style={{ marginRight: '10px' }} /> Dislike
+          </button>
+          <button className="like-button" onClick={handleLike}>
+            <MdThumbUp style={{ marginRight: '10px' }} /> Like
           </button>
         </div>
       </div>
