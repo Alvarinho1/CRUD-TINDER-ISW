@@ -7,6 +7,11 @@ export async function getUsers() {
             throw new Error('No hay token disponible');
         }
 
+        const usuario = JSON.parse(sessionStorage.getItem('usuario'));
+        if (!usuario || !usuario._id) {
+            throw new Error('No se encontró el ID del usuario');
+        }
+
         const config = {
             headers: {
                 'Cache-Control': 'no-cache',
@@ -14,7 +19,7 @@ export async function getUsers() {
             }
         };
 
-        const { data } = await axios.get('/users/', config);
+        const { data } = await axios.get(`/users?exclude=${usuario._id}`, config);
         return data;
     } catch (error) {
         throw error.response?.data || error.message;

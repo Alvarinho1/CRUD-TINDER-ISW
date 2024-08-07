@@ -171,12 +171,19 @@ const Register = () => {
                         required: false,
                     },
                     {
+                        label: "Descripción", // Campo añadido
+                        name: "descripcion",
+                        placeholder: "Tu descripción personal",
+                        type: "textarea",
+                        required: false,
+                    },
+
+                    {
                         label: "Foto de perfil", // Agrega el campo para la foto de perfil
                         name: "fotoPerfil",
                         type: "file",
                         required: false,
                     },
-                    
                     
                 ]}
                 buttonText="Registrarse"
@@ -193,5 +200,4 @@ const Register = () => {
         </main>
     );
 };
-
 export default Register;

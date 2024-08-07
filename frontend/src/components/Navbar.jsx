@@ -26,11 +26,12 @@ const Navbar = () => {
                         alt="Logo tinder"
                     />
                 </li>
-                 
+                {userRole === 'user' && (
                 <li className={location.pathname === "/inicio" ? "active" : ""}>
                     <NavLink to="/home">Inicio</NavLink>
                 </li>
-    
+                )} 
+
                 {userRole === 'admin' && (
                     <li className={location.pathname === "/users" ? "active" : ""}>
                         <NavLink to="/users">Usuarios</NavLink>
@@ -58,15 +59,10 @@ const Navbar = () => {
 
                     {userRole === 'user' && (
                     <li className={location.pathname === "/likesdados" ? "active" : ""}>
-                        <NavLink to="/likesdados">Likes Dados</NavLink>
+                        <NavLink to="/likesdados">Likes Recibidos</NavLink>
                     </li>  
                 )}  
 
-                    {userRole === 'user' && (
-                    <li className={location.pathname === "/likesrut" ? "active" : ""}>
-                        <NavLink to="/likesrut">Likes Recibidos</NavLink>
-                    </li>  
-                )}  
 
                     {userRole === 'user' && (
                     <li className={location.pathname === "/matches" ? "active" : ""}>

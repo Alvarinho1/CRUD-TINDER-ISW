@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BuscarLikesUserByRut } from '../services/buqueda.service'; // Asegúrate de que la ruta sea correcta
 import Navbar from '../components/Navbar';
+import '../styles/BusquedaLikesDados.css';
 
 const BusquedaLikesRut = () => {
     const [usuario, setUsuario] = useState(null);
@@ -30,12 +31,12 @@ const BusquedaLikesRut = () => {
     return (
         <div>
             <Navbar />
-             <h1>Likes del Alumno</h1>
+           
             {error ? (
                 <div>Error: {error}</div>
             ) : (
                 <table>
-                     
+                       <h1>Likes del Alumno</h1>
                     <thead>
                   
                         <tr>

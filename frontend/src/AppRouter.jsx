@@ -9,7 +9,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Users from "./pages/Users";
 import BusquedaRanking from "./pages/BusquedaRanking";
 import BusquedaLikesUser from "./pages/BusquedaLikesUser";
-import BusquedaLikesRut from "./pages/BusquedaLikesRut";
 import BusquedaLikesDados from "./pages/BusquedaLikesDados";
 import Matches from "./pages/Matches";
 
@@ -71,14 +70,6 @@ const AppRouter = () => {
         } 
       />
       
-      <Route 
-        path="/likesrut" 
-        element={
-          <ProtectedRoute allowedRoles={['user']}>
-            <BusquedaLikesRut />
-          </ProtectedRoute>
-        } 
-      />
 
       <Route 
         path="/likesdados" 

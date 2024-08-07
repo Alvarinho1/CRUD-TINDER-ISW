@@ -41,3 +41,24 @@ export async function createMatch(userId, matchUserId) {
         throw error.response?.data || error.message;
     }
 }
+
+export async function deleteMatchById(id) {
+    try {
+        const token = sessionStorage.getItem('accessToken');
+        if (!token) {
+            throw new Error('No hay token disponible');
+        }
+
+        const config = {
+            headers: {
+                'Cache-Control': 'no-cache',
+                'Authorization': `Bearer ${token.replace(/"/g, '')}`
+            }
+        };
+
+        const { data } = await axios.delete(`/match/alumnodelete/${id}`, config); // Usa `id` en lugar de `matchId`
+        return data;
+    } catch (error) {
+        throw error.response?.data || error.message;
+    }
+}

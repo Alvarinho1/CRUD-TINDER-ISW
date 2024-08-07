@@ -83,7 +83,6 @@ export async function BuscarLikesUserByRut() {
 
 
 
-// Función para buscar los likes dados por el usuario según su RUT almacenado en sessionStorage
 export async function BuscarLikesDados() {
     try {
         const token = sessionStorage.getItem('accessToken');
@@ -103,17 +102,18 @@ export async function BuscarLikesDados() {
             }
         };
 
-        // Realizar la solicitud GET para obtener los likes dados por el usuario según su RUT almacenado en sessionStorage
         const { data } = await axios.get(`/busqueda/alumno/likesdados/${usuario.rut}`, config);
 
         console.log('Datos de Likes por RUT:', data);
 
-        return [data.data || {}, null];
+        if (data && data.data) {
+            return [data.data, null];
+        } else {
+            return [[], null];
+        }
     } catch (error) {
         console.error('Error en BuscarLikesDados:', error.response?.data || error.message);
-
         return [null, error.response?.data || error.message];
     }
 }
-
 

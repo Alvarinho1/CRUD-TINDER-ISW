@@ -75,13 +75,13 @@ export async function updateUserProfile(data) {
 
         const config = {
             headers: {
-                'Authorization': `Bearer ${token}`,
+                'Authorization': `Bearer ${token.replace(/"/g, '')}`,
                 'Cache-Control': 'no-cache'
             }
         };
 
-        const response = await axios.put(`/users/${usuario.rut}`, data, config);
-        return response.data;
+        const { data: responseData } = await axios.put(`/users/${usuario.rut}`, data, config);
+        return responseData;
     } catch (error) {
         throw error.response?.data || error.message;
     }

@@ -1,59 +1,83 @@
-/* BusquedaLikesDados.css */
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap");
+@import url("animations.css");
 
+html,
 body {
-    font-family: 'Arial', sans-serif; /* Fuente más moderna y legible */
-    background-color: #f9f9f9; /* Color de fondo suave para toda la página */
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  place-items: center;
+  min-width: 100%;
+  min-height: 100vh;
+  font-family: "Montserrat", sans-serif;
 }
 
-.container {
-    display: flex;
-    justify-content: center; /* Centra horizontalmente */
-    align-items: center; /* Centra verticalmente */
-    height: 100vh; /* Ocupa el 100% de la altura de la ventana */
-    padding: 20px;
+.likes-page {
+  padding: 20px;
+  background-color: #0378a6;
+  min-height: 100vh;
 }
 
-.table-wrapper {
-    width: 100%;
-    max-width: 800px; /* Ancho máximo de la tabla */
-    background-color: #fff; /* Fondo blanco para la tabla */
-    border-radius: 8px; /* Bordes redondeados para la tabla */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil para la tabla */
-    padding: 20px;
+.likes-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #eef7ff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
 }
 
-h1 {
-    text-align: center;
-    color: #333; /* Color del texto del título */
-    margin-bottom: 20px; /* Espacio entre el título y la tabla */
+.likes-container h1 {
+  text-align: center;
+  color: #1a2e40;
+  margin-bottom: 20px;
+  font-size: 2em;
 }
 
-table {
-    border-collapse: collapse;
-    width: 100%;
+.likes-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
 }
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 12px;
-    text-align: left;
+.likes-table th,
+.likes-table td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  text-align: left;
 }
 
-th {
-    background-color: #007bff; /* Color de fondo de las cabeceras */
-    color: #000; /* Color del texto de las cabeceras (negro) */
+.likes-table th {
+  background-color: #0378a6;
+  color: #ffffff;
+  font-weight: bold;
 }
 
-td {
-    background-color: #f4f4f4; /* Color de fondo de las celdas */
+.likes-table tr:nth-child(even) {
+  background-color:  #eef7ff;
 }
 
-tr:nth-child(even) td {
-    background-color: #e9ecef; /* Color de fondo alternativo para filas pares */
+.likes-table tr:hover {
+  background-color: #04b2d9;
 }
 
-tr:hover td {
-    background-color: #e0e0e0; /* Color de fondo al pasar el ratón */
+.likes-table td {
+  color: #333;
+  font-size: 0.9em;
+}
+
+.likes-table td:first-child {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.likes-table td:last-child {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  margin: 20px 0;
 }

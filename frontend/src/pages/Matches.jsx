@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
-import { getMatchesByUserId } from '../services/match.service';
+import { getMatchesByUserId, deleteMatchById } from '../services/match.service';
 import '../styles/matches.css';  // Asegúrate de importar el archivo de estilos
 
 const Matches = () => {
   const [matches, setMatches] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchMatches = async () => {
@@ -21,18 +23,37 @@ const Matches = () => {
         }
       } catch (error) {
         console.error("Error fetching matches: ", error);
+        setError("Error al obtener los matches");
       }
+      setLoading(false);
     };
 
     fetchMatches();
   }, []);
+
+  const handleDeleteMatch = async (id) => {
+    try {
+      const data = await deleteMatchById(id); // Usa `id` como parámetro
+      if (data) {
+        setMatches(matches.filter(match => match._id !== id)); // Remove the deleted match from the UI
+        alert("Match eliminado exitosamente");
+      }
+    } catch (error) {
+      console.error("Error deleting match: ", error);
+      setError("Error al eliminar el match");
+    }
+  };
 
   return (
     <main className="matches-page">
       <Navbar />
       <div className="matches-container">
         <h1>Tus Matches</h1>
-        {matches.length > 0 ? (
+        {loading ? (
+          <p>Cargando...</p>
+        ) : error ? (
+          <div className="error-message">Error: {error}</div>
+        ) : matches.length > 0 ? (
           <table className="matches-table">
             <thead>
               <tr>
@@ -42,6 +63,7 @@ const Matches = () => {
                 <th>Descripción</th>
                 <th>Áreas de Interés</th>
                 <th>Cursos</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -53,6 +75,11 @@ const Matches = () => {
                   <td>{match.descripcion}</td>
                   <td>{Array.isArray(match.areasDeInteres) ? match.areasDeInteres.join(', ') : match.areasDeInteres}</td>
                   <td>{Array.isArray(match.cursos) ? match.cursos.join(', ') : match.cursos}</td>
+                  <td>
+                    <button onClick={() => handleDeleteMatch(match._id)} className="delete-button">
+                      Eliminar
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
